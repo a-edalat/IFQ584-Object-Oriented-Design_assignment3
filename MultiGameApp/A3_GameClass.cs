@@ -10,10 +10,7 @@
     private string result;
 
     // constructor
-    public Game(
-        List<Player> players,
-        List<Board> boards,
-        string gameMode)
+    public Game(List<Player> players, List<Board> boards, string gameMode)
     {
         // currentPlayer initialisation
         // checking validity of the players before selecting initial player
@@ -28,7 +25,8 @@
         {
             throw new ArgumentException(
                 "You currently have zero players, at least one player is required.",
-                nameof(players));
+                nameof(players)
+            );
         }
 
         // boards initialisation
@@ -42,15 +40,14 @@
         {
             throw new ArgumentException(
                 "You currently have zero boards, at least one board is required.",
-                nameof(boards));
+                nameof(boards)
+            );
         }
 
         // gameMode
         if (string.IsNullOrWhiteSpace(gameMode))
         {
-            throw new ArgumentException(
-                "A blank game mode was provided.",
-                nameof(gameMode));
+            throw new ArgumentException("A blank game mode was provided.", nameof(gameMode));
         }
 
         // now we validated things above, we can initialise players, the current
@@ -165,8 +162,7 @@
 
         if (currentPlayerIndex < 0)
         {
-            throw new InvalidOperationException(
-                "The current player is not in the players list.");
+            throw new InvalidOperationException("The current player is not in the players list.");
         }
 
         try
@@ -219,5 +215,4 @@
             TakeTurn();
         }
     }
-
 } // closes Game class
