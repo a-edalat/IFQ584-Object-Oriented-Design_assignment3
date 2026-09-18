@@ -7,6 +7,7 @@ public abstract class Game
     private List<Player> _players;
     private Player currentPlayer;
     private MoveHistory moveHistory;
+
     // private string gameMode;
     // private bool isGameOver;
     // private string result;
@@ -52,13 +53,22 @@ public abstract class Game
             throw new ArgumentOutOfRangeException(nameof(mode), "The game mode is not valid.");
         }
 
-         _players = players;
+        _players = players;
         _boards = boards;
         _moveHistory = new MoveHistory();
         _currentPlayer = players[0];
 
         Mode = mode;
         Result = GameResult.IN_PROGRESS;
+    }
+
+    public GameMode Mode { get; }
+
+    public GameResult Result { get; protected set; }
+
+    public bool IsGameOver
+    {
+        get { return Result != GameResult.IN_PROGRESS; }
     }
 
     // Methods
