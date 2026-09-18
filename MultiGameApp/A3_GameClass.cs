@@ -1,16 +1,18 @@
-﻿public abstract class Game
+﻿namespace MultiGameApp;
+
+public abstract class Game
 {
     // fields
-    private List<Board> boards;
-    private List<Player> players;
+    private List<Board> _boards;
+    private List<Player> _players;
     private Player currentPlayer;
     private MoveHistory moveHistory;
-    private string gameMode;
-    private bool isGameOver;
-    private string result;
+    // private string gameMode;
+    // private bool isGameOver;
+    // private string result;
 
     // constructor
-    public Game(List<Player> players, List<Board> boards, string gameMode)
+    public Game(List<Player> players, List<Board> boards, GameMode mode)
     {
         // currentPlayer initialisation
         // checking validity of the players before selecting initial player
@@ -45,25 +47,18 @@
         }
 
         // gameMode
-        if (string.IsNullOrWhiteSpace(gameMode))
+        if (Enum.IsDefined(typeof(GameMode), mode) == false)
         {
-            throw new ArgumentException("A blank game mode was provided.", nameof(gameMode));
+            throw new ArgumentOutOfRangeException(nameof(mode), "The game mode is not valid.");
         }
 
-        // now we validated things above, we can initialise players, the current
-        // player, boards and gameMode
-        this.players = players;
-        this.boards = boards;
-        this.gameMode = gameMode;
+         _players = players;
+        _boards = boards;
+        _moveHistory = new MoveHistory();
+        _currentPlayer = players[0];
 
-        // current result assumption is result would be empty string unless there are
-        // results to be shown
-        this.moveHistory = new MoveHistory();
-        this.isGameOver = false;
-        this.result = "";
-
-        // initial player is picked from the validated list
-        this.currentPlayer = players[0];
+        Mode = mode;
+        Result = GameResult.IN_PROGRESS;
     }
 
     // Methods
