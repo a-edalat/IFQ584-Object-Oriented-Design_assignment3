@@ -112,6 +112,31 @@ public abstract class Game
         return true; // returning true after validation checks above
     }
 
+    // adding tmp makemove - can be removed later, boilerplate for me to use when testing game subclasses
+    public bool MakeMove(Move move)
+    {
+        if (IsGameOver)
+        {
+            return false;
+        }
+
+        if (IsValidMove(move) == false)
+        {
+            return false;
+        }
+
+        ApplyMove(move);
+        _moveHistory.AddMove(move);
+        Result = EvaluateResult();
+
+        if (Result == GameResult.IN_PROGRESS)
+        {
+            SwitchPlayer();
+        }
+
+        return true;
+    }
+
     public void ApplyMove(Move move)
     {
         Board selectedBoard = _boards[move.BoardIndex];
