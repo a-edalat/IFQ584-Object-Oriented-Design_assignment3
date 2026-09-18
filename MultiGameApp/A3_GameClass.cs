@@ -3,10 +3,10 @@
 public abstract class Game
 {
     // fields
-    private List<Board> _boards;
-    private List<Player> _players;
-    private Player currentPlayer;
-    private MoveHistory moveHistory;
+    private readonly List<Board> _boards;
+    private readonly List<Player> _players;
+    private readonly MoveHistory _moveHistory;
+    private Player _currentPlayer;
 
     // private string gameMode;
     // private bool isGameOver;
@@ -62,6 +62,7 @@ public abstract class Game
         Result = GameResult.IN_PROGRESS;
     }
 
+    // getters
     public GameMode Mode { get; }
 
     public GameResult Result { get; protected set; }
@@ -97,7 +98,7 @@ public abstract class Game
         // currently using .Rows and .Columns, but during implementation I may
         // Change this to size. so an i and j values essentially.
         // Now that I know boardindex is valid, I can read the board
-        Board selectedBoard = boards[boardIndex];
+        Board selectedBoard = _boards[boardIndex];
 
         // if (row < 0 || row >= selectedBoard.Rows)
         if (selectedBoard.IsWithinBoard(row, col) == false)
@@ -113,57 +114,56 @@ public abstract class Game
 
     public void ApplyMove(Move move)
     {
-        if (IsValidMove(move) == false)
-        {
-            return;
-        }
-
-        Board selectedBoard = boards[move.BoardIndex];
+        Board selectedBoard = _boards[move.BoardIndex];
 
         selectedBoard.PlaceMove(move);
     }
 
     public void UndoMove()
     {
-        if (moveHistory.GetCurrentIndex() < 0)
+        if (_moveHistory.GetCurrentIndex() < 0)
         {
             return;
         }
 
-        Move moveToUndo = moveHistory.UndoLastMove();
+        Move moveToUndo = _moveHistory.UndoLastMove();
 
-        Board selectedBoard = boards[moveToUndo.BoardIndex];
-
-        currentPlayer = moveToUndo.GetPlayer();
+        Board selectedBoard = _boards[moveToUndo.BoardIndex];
 
         selectedBoard.RemoveMove(moveToUndo); // removing the last move
+        _currentPlayer = moveToUndo.GetPlayer();
+        Result = EvaluateResult();
+
+        return true;
     }
 
     public void RedoMove()
     {
-        if (moveHistory.GetCurrentIndex() >= moveHistory.GetMoves().Count - 1)
+        if (_moveHistory.GetCurrentIndex() >= _moveHistory.GetMoves().Count - 1)
         {
             return;
         }
 
-        Move moveToRedo = moveHistory.RedoLastMove();
+        Move moveToRedo = _moveHistory.RedoLastMove();
 
-        Board selectedBoard = boards[moveToRedo.BoardIndex];
+        Board selectedBoard = _boards[moveToRedo.BoardIndex];
 
-        currentPlayer = moveToRedo.GetPlayer();
+        selectedBoard.PlaceMove(moveToRedo);
+        _currentPlayer = moveToRedo.GetPlayer();
+        Result = EvaluateResult();
 
-        selectedBoard.PlaceMove(moveToRedo); // redoing the last move
+        if (Result == GameResult.IN_PROGRESS)
+        {
+            SwitchPlayer();
+        }
 
-        // the current player made a move, switching players
-        // Confirm later if this works correctly
-        SwitchPlayer();
+        return true;
     }
 
     // made it protected so the concrete subclasses be able to use it easily
     protected void SwitchPlayer()
     {
         int currentPlayerIndex = _players.IndexOf(_currentPlayer);
-        int newPlayerIndex = currentPlayerIndex + 1;
 
         if (currentPlayerIndex < 0)
         {
@@ -182,40 +182,23 @@ public abstract class Game
 
     public Player GetCurrentPlayer()
     {
-        return currentPlayer;
+        return _currentPlayer;
     }
 
-    public abstract bool CheckGameOver();
     public abstract List<Move> GetValidMoves();
     public abstract bool WouldMoveWin(Move move);
-    public abstract string GetResult();
+    public abstract GameResult EvaluateResult();
     public abstract string GetHelpText();
 
     public void TakeTurn()
     {
-        Move proposedMove = currentPlayer.GetMove();
-
-        if (IsValidMove(proposedMove) == false)
-        {
-            return;
-        }
-
-        ApplyMove(proposedMove);
-        moveHistory.AddMove(proposedMove); //consider adding this to ApplyMove
-
-        isGameOver = CheckGameOver();
-
-        if (isGameOver == false)
-        {
-            SwitchPlayer();
-        }
+        Move proposedMove = _currentPlayer.GetMove();
+        MakeMove(proposedMove);
     }
 
     public void StartGame()
     {
-        isGameOver = false;
-
-        while (isGameOver == false)
+        while (Result == GameResult.IN_PROGRESS)
         {
             TakeTurn();
         }
