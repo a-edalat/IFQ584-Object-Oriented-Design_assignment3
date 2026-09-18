@@ -162,7 +162,7 @@ public abstract class Game
     // made it protected so the concrete subclasses be able to use it easily
     protected void SwitchPlayer()
     {
-        int currentPlayerIndex = players.IndexOf(currentPlayer);
+        int currentPlayerIndex = _players.IndexOf(_currentPlayer);
         int newPlayerIndex = currentPlayerIndex + 1;
 
         if (currentPlayerIndex < 0)
@@ -170,14 +170,14 @@ public abstract class Game
             throw new InvalidOperationException("The current player is not in the players list.");
         }
 
-        try
+        int nextPlayerIndex = currentPlayerIndex + 1;
+
+        if (nextPlayerIndex >= _players.Count)
         {
-            currentPlayer = players[newPlayerIndex];
+            nextPlayerIndex = 0;
         }
-        catch (ArgumentOutOfRangeException)
-        {
-            currentPlayer = players[0];
-        }
+
+        _currentPlayer = _players[nextPlayerIndex];
     }
 
     public Player GetCurrentPlayer()
