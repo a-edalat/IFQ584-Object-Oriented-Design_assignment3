@@ -27,56 +27,56 @@ public class GomokuGame : Game
     };
 
     // assuming functions from CRC/Class diag until codified
-    public GomokuGame(List<Player> players, BlobReader board, enum gameMode) : base(ValidatePlayers(players), CreateBoardList(board), gameMode)
+    public GomokuGame(List<Player> players, Board board, gameMode mode)
+        : base(ValidatePlayers(players), CreateBoardList(board), mode)
     {
-        _players = players; 
+        _players = players;
         _board = BoardSize;
-        _result = GameResult.IN_PROGRESS;
 
         ValidatePlayerMarks();
     }
 
     public override List<Move> GetValidMoves()
     {
-        // 
+        //
     }
 
     protected override bool IsValidMove(Move move)
     {
-        // 
+        //
     }
 
     public override bool WouldMoveWin(Move move)
     {
-        // 
+        //
     }
 
     public override bool CheckGameOver()
     {
-        // 
+        //
     }
 
     public override string GetResult()
     {
-        // 
-    }   
+        //
+    }
 
-     public override string GetHelpText()
+    public override string GetHelpText()
     {
-        // 
+        //
     }
 
     private bool TryFindWinningSymbol(out string winningSymbol)
     {
-        // 
+        //
     }
 
     private bool HasWinningLine(int row, int column, string symbol)
     {
-        // 
+        //
     }
 
-     private int CountDirection(
+    private int CountDirection(
         int startingRow,
         int startingColumn,
         int rowChange,
@@ -84,31 +84,31 @@ public class GomokuGame : Game
         string symbol
     )
     {
-        // 
+        //
     }
 
     private GameResult GetWinResult(string winningSymbol)
     {
-        // 
+        //
     }
 
     private void ValidatePlayerMarks()
     {
-        // 
+        //
     }
 
-     private static MarkPiece GetPlayerMark(Player player)
+    private static MarkPiece GetPlayerMark(Player player)
     {
-        // 
+        //
     }
 
     private static List<Player> ValidatePlayers(List<Player> players)
     {
-        // 
+        //
     }
 
     private static List<Board> CreateBoardList(Board board)
     {
-        // 
+        //
     }
 }
