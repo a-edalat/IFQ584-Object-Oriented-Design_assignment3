@@ -1,12 +1,40 @@
+using System.Reflection.Metadata;
+
 namespace MultiGameApp;
 
 public class GomokuGame : Game
 {
+    // A2 spec says 15x15 or less for presentation
     public const int BoardSize = 15;
     public const int WinningLength = 5;
 
     private readonly Board _board;
     private readonly List<Player> _players;
     private GameResult _result;
+
+    // each row contains one direction
+    // opposite directions are checked as matched pairs
+    private static readonly int[,] Directions =
+    {
+        // vertical
+        { 1, 0 },
+        // horizontal
+        { 0, 1 },
+        // descending diag
+        { 1, 1 },
+        // ascending diag
+        { 1, -1 },
+    };
+
+    // assuming functions from CRC/Class diag until codified
+    public GomokuGame(List<Player> players, BlobReader board, enum gameMode) : base(ValidatePlayers(players), CreateBoardList(board), gameMode)
+    {
+        _players = players; 
+        _board = BoardSize;
+        _result = GameResult.IN_PROGRESS;
+
+        ValidatePlayerMarks();
+    }
+
     
 }
