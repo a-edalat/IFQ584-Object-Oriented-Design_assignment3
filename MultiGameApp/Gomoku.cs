@@ -36,5 +36,79 @@ public class GomokuGame : Game
         ValidatePlayerMarks();
     }
 
-    
+    public override List<Move> GetValidMoves()
+    {
+        // 
+    }
+
+    protected override bool IsValidMove(Move move)
+    {
+        // 
+    }
+
+    public override bool WouldMoveWin(Move move)
+    {
+        // 
+    }
+
+    public override bool CheckGameOver()
+    {
+        // 
+    }
+
+    public override string GetResult()
+    {
+        // 
+    }   
+
+     public override string GetHelpText()
+    {
+        // 
+    }
+
+    private bool TryFindWinningSymbol(out string winningSymbol)
+    {
+        // 
+    }
+
+    private bool HasWinningLine(int row, int column, string symbol)
+    {
+        // 
+    }
+
+     private int CountDirection(
+        int startingRow,
+        int startingColumn,
+        int rowChange,
+        int columnChange,
+        string symbol
+    )
+    {
+        // 
+    }
+
+    private GameResult GetWinResult(string winningSymbol)
+    {
+        // 
+    }
+
+    private void ValidatePlayerMarks()
+    {
+        // 
+    }
+
+     private static MarkPiece GetPlayerMark(Player player)
+    {
+        // 
+    }
+
+    private static List<Player> ValidatePlayers(List<Player> players)
+    {
+        // 
+    }
+
+    private static List<Board> CreateBoardList(Board board)
+    {
+        // 
+    }
 }
