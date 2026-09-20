@@ -1,4 +1,6 @@
-﻿namespace MultiGameApp;
+﻿using System.IO.Compression;
+
+namespace MultiGameApp;
 
 public abstract class Game
 {
@@ -81,7 +83,7 @@ public abstract class Game
     // and will have specifics later
     // Made this protected as I am going to use makemove to call this to validate
     // with protected, derived classes can also use this
-    protected bool IsValidMove(Move move)
+    protected virtual bool IsValidMove(Move move)
     {
         ArgumentNullException.ThrowIfNull(move); //Making sure move is not null
 
@@ -91,7 +93,7 @@ public abstract class Game
         int col = move.Column;
         int boardIndex = move.BoardIndex;
 
-        if (boardIndex < 0 || boardIndex >= boards.Count)
+        if (boardIndex < 0 || boardIndex >= _boards.Count)
         {
             return false;
         }
@@ -144,11 +146,11 @@ public abstract class Game
         selectedBoard.PlaceMove(move);
     }
 
-    public void UndoMove()
+    public bool UndoMove()
     {
         if (_moveHistory.GetCurrentIndex() < 0)
         {
-            return;
+            return false;
         }
 
         Move moveToUndo = _moveHistory.UndoLastMove();
@@ -162,11 +164,11 @@ public abstract class Game
         return true;
     }
 
-    public void RedoMove()
+    public bool RedoMove()
     {
         if (_moveHistory.GetCurrentIndex() >= _moveHistory.GetMoves().Count - 1)
         {
-            return;
+            return false;
         }
 
         Move moveToRedo = _moveHistory.RedoLastMove();
