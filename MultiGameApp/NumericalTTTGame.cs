@@ -18,7 +18,7 @@ public class NumericalTTTGame : Game
         BoardSize = board.Rows;
         TargetSum = BoardSize * (BoardSize * BoardSize + 1) / 2;
 
-        // true / false for odd / true
+        // true / false for odd / even
         ValidatePlayerNumbers(_players[0], true, "Player one");
         ValidatePlayerNumbers(_players[1], false, "Player one");
     }
@@ -37,7 +37,7 @@ public class NumericalTTTGame : Game
     {
         // extract and sort numerical values assigned to player
         var numbers = player
-            .AvailablePieces.ofType<NumberPiece>()
+            .AvailablePieces.OfType<NumberPiece>()
             .Select(number => number.Value)
             .OrderBy(value => value)
             .ToList();
@@ -45,7 +45,7 @@ public class NumericalTTTGame : Game
         // build the complete set of odd or even numbers
         var expectedNumbers = Enumerable
             .Range(1, BoardSize * BoardSize)
-            .Where(value => value % 2 != 0 == shouldBeOdd)
+            .Where(value => (value % 2 != 0) == shouldBeOdd)
             .ToList();
 
         // catch and throw errors
@@ -209,6 +209,6 @@ public class NumericalTTTGame : Game
 
     public override string GetHelpText()
     {
-        return $"Place one of your unused numbers in an empty cell. Player one uses odd numbers. Player two uses even numbbers. Complete a row, column, or diagonal that sums to {TargetSum} to win.";
+        return $"Place one of your unused numbers in an empty cell. Player one uses odd numbers. Player two uses even numbers. Complete a row, column, or diagonal that sums to {TargetSum} to win.";
     }
 }

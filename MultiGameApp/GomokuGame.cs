@@ -151,7 +151,7 @@ public class GomokuGame : Game
     }
 
     // game progress
-    protected override GameResult EvaluateResult()
+    public override GameResult EvaluateResult()
     {
         for (int row = 0; row < _board.Rows; row++)
         {
