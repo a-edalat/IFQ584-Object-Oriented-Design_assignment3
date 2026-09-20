@@ -125,6 +125,13 @@ public abstract class Game
             return false;
         }
 
+        Player player = move.GetPlayer();
+
+        if (!player.UsePiece(move.Piece))
+        {
+            return false;
+        }
+
         ApplyMove(move);
         _moveHistory.AddMove(move);
         Result = EvaluateResult();
@@ -152,11 +159,13 @@ public abstract class Game
         }
 
         Move moveToUndo = _moveHistory.UndoLastMove();
-
         Board selectedBoard = _boards[moveToUndo.BoardIndex];
+        Player player = moveToUndo.GetPlayer();
 
-        selectedBoard.RemoveMove(moveToUndo); // removing the last move
-        _currentPlayer = moveToUndo.GetPlayer();
+        selectedBoard.RemoveMove(moveToUndo);
+        player.RestorePiece(moveToUndo.Piece);
+
+        _currentPlayer = player;
         Result = EvaluateResult();
 
         return true;
@@ -170,8 +179,13 @@ public abstract class Game
         }
 
         Move moveToRedo = _moveHistory.RedoLastMove();
-
         Board selectedBoard = _boards[moveToRedo.BoardIndex];
+        Player player = moveToRedo.GetPlayer();
+
+        if (!player.UsePiece(moveToRedo.Piece))
+        {
+            throw new InvalidOperationException("The piece required for redo is not available.");
+        }
 
         selectedBoard.PlaceMove(moveToRedo);
         _currentPlayer = moveToRedo.GetPlayer();
