@@ -25,7 +25,12 @@ public class NumericalTTTGame : Game
 
     private static List<Player> ValidatePlayers(List<Player> players)
     {
-        //
+        ArgumentNullException.ThrowIfNull(players);
+
+        if (players.Count != 2)
+            throw new ArgumentException("Numerical Tic-Tac-Toe requires two players.");
+
+        return players;
     }
 
     private void ValidatePlayerNumbers(Player player, bool shouldBeOdd, string playerName)
@@ -35,7 +40,14 @@ public class NumericalTTTGame : Game
 
     private static List<Board> CreateBoardList(Board board)
     {
-        //
+        ArgumentNullException.ThrowIfNull(board);
+
+        if (board.Rows < 3 || board.Rows != board.Columns)
+            throw new ArgumentException(
+                "Numerical Tic-Tac-Toe requires a square board, of at least 3x3."
+            );
+
+        return [board];
     }
 
     public override List<Move> GetValidMoves()
@@ -90,6 +102,6 @@ public class NumericalTTTGame : Game
 
     public override string GetHelpText()
     {
-        //
+        return $"Place one of your unused numbers in an empty cell. Player one uses odd numbers. Player two uses even numbbers. Complete a row, column, or diagonal that sums to {TargetSum} to win.";
     }
 }
