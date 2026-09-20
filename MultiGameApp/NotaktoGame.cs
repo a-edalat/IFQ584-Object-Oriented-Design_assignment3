@@ -10,6 +10,7 @@ public class NotaktoGame : Game
     private readonly List<Board> _boards;
     private readonly List<Player> _players;
     private readonly List<int> _inactiveBoards = [];
+    private readonly string _symbol;
 
     public IReadOnlyList<int> InactiveBoard => _inactiveBoards;
 
@@ -68,17 +69,56 @@ public class NotaktoGame : Game
 
     public override List<Move> GetValidMoves()
     {
-        //
+        var validMoves = new List<Move>();
+        var player = GetCurrentPlayer();
+        var mark = GetPlayerMark(player);
+
+        for (int i = 0; i < _boards.Count; i++)
+        {
+            var board = _boards[i];
+
+            if (CheckBoardHasLine(board))
+                continue;
+
+            for (int row = 0; row < BoardSize; row++)
+            {
+                for (int col = 0; col < BoardSize; col++)
+                {
+                    if (board.IsCellEmpty(row, col))
+                        validMoves.Add(new Move(player, i, row, col, mark));
+                }
+            }
+        }
+
+        return validMoves;
     }
 
     protected override bool IsValidMove(Move move)
     {
-        //
+        if (!base.IsValidMove(move) || CheckBoardHasLine(_boards[move.boardIndex]))
+            return false;
+
+        var player = GetCurrentPlayer();
+
+        if (!ReferenceEquals(move.GetPlayer(), player))
+            return false;
+
+        return ReferenceEquals(move.Piece, GetPlayerMark(player))
+            && move.Piece is MarkPiece mark
+            && mark.Symbol == _symbol;
     }
 
     private bool CheckBoardHasLine(Board board)
     {
-        //
+        for (int i = 0; i < BoardSize; i++)
+        {
+            // check row or col
+            if (CheckLine(board, i, 0, 0, 1) || CheckLine(board, 0, i, 1, 0))
+                return true;
+        }
+
+        // check diags
+        return CheckLine(board, 0, 0, 1, 1) || CheckLine(board, 0, BoardSize - 1, 1, -1);
     }
 
     private bool CheckLine(
@@ -89,12 +129,25 @@ public class NotaktoGame : Game
         int columnChange
     )
     {
-        //
+        for (int i = 0; i < BoardSize; i++)
+        {
+            int row = startingRow + i * rowChange;
+            int col = startingColumn + i * columnChange;
+
+            if (board.GetCell(row, col) is not MarkPiece mark || mark.Symbol != _symbol)
+                return false;
+        }
     }
 
     private void RefreshInactiveBoards()
     {
-        //
+        _inactiveBoards.Clear();
+
+        for (int i = 0; i < _boards.Count; i++)
+        {
+            if (CheckBoardHasLine(_boards[i]))
+                _inactiveBoards.Add(i);
+        }
     }
 
     public override bool WouldMoveWin(Move move)
