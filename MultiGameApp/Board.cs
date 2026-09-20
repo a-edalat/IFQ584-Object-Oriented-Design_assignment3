@@ -1,5 +1,7 @@
 namespace MultiGameApp;
 
+// Moving Display board to GameController or a UI class similar to what Xander was suggesting
+
 public class Board
 {
     // fields
@@ -21,26 +23,13 @@ public class Board
             throw new ArgumentException(nameof(cols));
         }
 
-        // I assume the boards should have the same number of rows and columns
-        // smarter thing is to move this check to each game, check if Xander has done this
-        if (rows != cols)
-        {
-            throw new ArgumentException(nameof(rows));
-        }
-
         this.rows = rows;
         this.cols = cols;
         cells = new int[rows * cols]; // array for number of cells
-
     }
 
     // Methods
-    // - PlaceMove
-    // - RemoveMove
-    // - IsFull
 
-    // decided to make IsWithinBoard private, as all my methods here are the ones
-    // that are using it to check if they should progress
     public bool IsWithinBoard(int row, int col)
     {
         if (row >= rows || row < 0)
@@ -77,7 +66,7 @@ public class Board
         {
             throw new ArgumentOutOfRangeException();
         }
-        if (IsCellEmpty(row, col) == true)
+        if (IsCellEmpty(row, col) == false)
         {
             throw new InvalidOperationException();
         }
@@ -99,13 +88,12 @@ public class Board
         {
             throw new ArgumentOutOfRangeException();
         }
-        if (IsCellEmpty(row, col) == false)
+        if (IsCellEmpty(row, col) == true)
         {
             throw new InvalidOperationException();
         }
 
-        int index = row * cols + col;
-        cells[index] = 0;
+        SetCell(row, col, 0);
     }
 
     public bool IsFull()
@@ -119,8 +107,12 @@ public class Board
         cells[index] = value;
     }
 
-    public void GetCell(int row, int col, int value)
+    public int GetCell(int row, int col)
     {
+        if (!IsWithinBoard(row, col))
+        {
+            throw new ArgumentOutOfRangeException();
+        }
         int index = row * cols + col; //cols is the number of column in the board
         return cells[index];
     }
