@@ -1,3 +1,5 @@
+using System.Reflection.Metadata;
+
 namespace MultiGameApp;
 
 public class NotaktoGame : Game
@@ -25,5 +27,66 @@ public class NotaktoGame : Game
 
         _symbol = playerOneMark.Symbol;
         RefreshInactiveBoards();
+    }
+
+    private static List<Player> ValidatePlayers(List<Player> players)
+    {
+        //
+    }
+
+    private static List<Board> ValidateBoards(List<Board> boards)
+    {
+        //
+    }
+
+    private static MarkPiece GetPlayerMark(Player player)
+    {
+        //
+    }
+
+    public override List<Move> GetValidMoves()
+    {
+        //
+    }
+
+    protected override bool IsValidMove(Move move)
+    {
+        //
+    }
+
+    private bool CheckBoardHasLine(Board board)
+    {
+        //
+    }
+
+    private bool CheckLine(
+        BlobReader board,
+        int startingRow,
+        int startingColumn,
+        int rowChange,
+        int columnChange
+    )
+    {
+        //
+    }
+
+    private void RefreshInactiveBoards()
+    {
+        //
+    }
+
+    public override bool WouldMoveWin(Move move)
+    {
+        //
+    }
+
+    public override GameResult EvaluateResult()
+    {
+        //
+    }
+
+    public override string GetHelpText()
+    {
+        //
     }
 }
