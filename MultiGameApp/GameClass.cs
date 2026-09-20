@@ -1,6 +1,4 @@
-﻿using System.IO.Compression;
-
-namespace MultiGameApp;
+﻿namespace MultiGameApp;
 
 public abstract class Game
 {
