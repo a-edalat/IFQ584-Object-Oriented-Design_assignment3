@@ -116,5 +116,4 @@ public class Board
         int index = row * cols + col; //cols is the number of column in the board
         return cells[index];
     }
-
 } // closes Board class

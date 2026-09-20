@@ -10,7 +10,7 @@ public class NotaktoGame : Game
     private readonly List<int> _inactiveBoards = [];
     private readonly string _symbol;
 
-    public IReadOnlyList<int> InactiveBoard => _inactiveBoards;
+    public IReadOnlyList<int> InactiveBoards => _inactiveBoards;
 
     public NotaktoGame(List<Player> players, List<Board> boards, GameMode mode)
         : base(ValidatePlayers(players), ValidateBoards(boards), mode)
@@ -93,7 +93,7 @@ public class NotaktoGame : Game
 
     protected override bool IsValidMove(Move move)
     {
-        if (!base.IsValidMove(move) || CheckBoardHasLine(_boards[move.boardIndex]))
+        if (!base.IsValidMove(move) || CheckBoardHasLine(_boards[move.BoardIndex]))
             return false;
 
         var player = GetCurrentPlayer();
@@ -135,6 +135,8 @@ public class NotaktoGame : Game
             if (board.GetCell(row, col) is not MarkPiece mark || mark.Symbol != _symbol)
                 return false;
         }
+
+        return true;
     }
 
     private void RefreshInactiveBoards()
