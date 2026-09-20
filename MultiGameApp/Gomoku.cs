@@ -1,20 +1,15 @@
-using System.Linq.Expressions;
-using System.Reflection.Metadata;
-
 namespace MultiGameApp;
 
 public class GomokuGame : Game
 {
-    // A2 spec says 15x15 or less for presentation
+    // A2 spec says 15x15; optional smaller for UI if needed.
     public const int BoardSize = 15;
     public const int WinningLength = 5;
 
     private readonly Board _board;
     private readonly List<Player> _players;
-    private GameResult _result;
 
-    // each row contains one direction
-    // opposite directions are checked as matched pairs
+    // each tuple stores one direction for winning validation checks
     private static readonly (int Row, int Column)[] Directions =
     [
         // vertical
@@ -28,61 +23,106 @@ public class GomokuGame : Game
     ];
 
     // assuming functions from CRC/Class diag until codified
-    public GomokuGame(List<Player> players, Board board, gameMode mode)
+    // initialisation
+    public GomokuGame(List<Player> players, Board board, GameMode mode)
         : base(ValidatePlayers(players), CreateBoardList(board), mode)
     {
         _players = players;
-        _board = BoardSize;
+        _board = board;
 
         ValidatePlayerMarks();
     }
 
+    private static List<Player> ValidatePlayers(List<Player> players)
+    {
+        ArgumentNullException.ThrowIfNull(players);
+
+        if (players.Count != 2)
+            throw new ArgumentException("Gomoku requires exactly two players.", nameof(players));
+
+        return players;
+    }
+
+    private void ValidatePlayerMarks()
+    {
+        if (GetPlayerMark(_players[0]).Symbol == GetPlayerMark(_players[1]).Symbol)
+            throw new ArgumentException("Gomoku players must use different marks.");
+    }
+
+    private static MarkPiece GetPlayerMark(Player player)
+    {
+        foreach (var piece in player.AvailablePieces)
+        {
+            if (piece is MarkPiece mark)
+                return mark;
+        }
+
+        throw new InvalidOperationException("Each Gomoku player must have a mark.");
+    }
+
+    private static List<Board> CreateBoardList(Board board)
+    {
+        ArgumentNullException.ThrowIfNull(board);
+
+        if (board.Rows != BoardSize || board.Columns != BoardSize)
+            throw new ArgumentException("Gomoku requires a 15 by 15 board.", nameof(board));
+
+        return [board];
+    }
+
+    // moves
     public override List<Move> GetValidMoves()
     {
-        // get player and mark
-        // visit every board position
-        // if empty cell
-        //  add move
-        // return collected moves
+        var validMoves = new List<Move>();
+        var player = GetCurrentPlayer();
+        var mark = GetPlayerMark(player);
+
+        for (int row = 0; row < _board.Rows; row++)
+        {
+            for (int column = 0; column < _board.Columns; column++)
+            {
+                if (_board.IsCellEmpty(row, column))
+                    validMoves.Add(new Move(player, 0, row, column, mark));
+            }
+        }
+
+        return validMoves;
     }
 
     protected override bool IsValidMove(Move move)
     {
-        // check
-        // index, boundaries, empty cell
-        // move belongs to player
-        // markpiece with players symbol
-        // true if yes
+        if (!base.IsValidMove(move) || move.BoardIndex != 0)
+            return false;
+
+        var player = GetCurrentPlayer();
+        if (!ReferenceEquals(move.GetPlayer(), player))
+            return false;
+
+        return move.Piece is MarkPiece mark && mark.Symbol == GetPlayerMark(player).Symbol;
     }
 
+    // win state
     public override bool WouldMoveWin(Move move)
     {
-        // count the mark as centre of possible line
-        // count matching neighbours forward
-        // count matching neighbours opposite
-        // true if combined <=5
-        // false otherwise and remove
-    }
+        if (!IsValidMove(move) || move.Piece is not MarkPiece mark)
+            return false;
 
-    protected override GameResult EvaluateResult()
-    {
-        // for each row and col
-        // if cell has piece
-        // if winning line is true return get winresult (specifies which player won)
-    }
-
-    public override string GetHelpText()
-    {
-        // return how to play gomoku
+        return HasWinningLine(move.Row, move.Column, mark.Symbol);
     }
 
     private bool HasWinningLine(int row, int column, string symbol)
     {
-        // visit each occupied board position
-        // if winning line found
-        // compare symbol with player and return correct - WIN
-        // if no line wins and board full - DRAW
-        // other - IN PROGRESS
+        foreach (var direction in Directions)
+        {
+            int lineLength = 1;
+            lineLength += CountDirection(row, column, direction.Row, direction.Column, symbol);
+            lineLength += CountDirection(row, column, -direction.Row, -direction.Column, symbol);
+
+            if (lineLength >= WinningLength)
+                return true;
+        }
+
+        return false;
     }
 
     private int CountDirection(
@@ -93,38 +133,59 @@ public class GomokuGame : Game
         string symbol
     )
     {
-        // start at the neighbouring cell
-        // continue while the position is on the board
-        // stop when the cell does not contain the required mark
-        // otherwise increase the count and move one more cell in that direction
-        // return the uninterrupted mark count
+        int count = 0;
+        int row = startingRow + rowChange;
+        int column = startingColumn + columnChange;
+
+        while (_board.IsWithinBoard(row, column))
+        {
+            if (_board.GetCell(row, column) is not MarkPiece mark || mark.Symbol != symbol)
+                break;
+
+            count++;
+            row += rowChange;
+            column += columnChange;
+        }
+
+        return count;
+    }
+
+    // game progress
+    protected override GameResult EvaluateResult()
+    {
+        for (int row = 0; row < _board.Rows; row++)
+        {
+            for (int column = 0; column < _board.Columns; column++)
+            {
+                if (
+                    _board.GetCell(row, column) is MarkPiece mark
+                    && HasWinningLine(row, column, mark.Symbol)
+                )
+                {
+                    return GetWinResult(mark.Symbol);
+                }
+            }
+        }
+
+        return _board.IsFull() ? GameResult.DRAW : GameResult.IN_PROGRESS;
     }
 
     private GameResult GetWinResult(string winningSymbol)
     {
-        // return symbol owned by player as winner
-        // else throw invalid error
+        if (GetPlayerMark(_players[0]).Symbol == winningSymbol)
+            return GameResult.PLAYER_ONE_WIN;
+
+        if (GetPlayerMark(_players[1]).Symbol == winningSymbol)
+            return GameResult.PLAYER_TWO_WIN;
+
+        throw new InvalidOperationException("The winning mark does not belong to a player.");
     }
 
-    private void ValidatePlayerMarks()
+    // help
+    public override string GetHelpText()
     {
-        // gomoku players must use different marks
-    }
-
-    private static MarkPiece GetPlayerMark(Player player)
-    {
-        // return player mark
-        //  return error if none
-    }
-
-    private static List<Player> ValidatePlayers(List<Player> players)
-    {
-        // return error if player count != 2
-    }
-
-    private static List<Board> CreateBoardList(Board board)
-    {
-        // if board null or not 15x15 return error
-        // return board
+        return "Place your mark in an empty cell on the 15 by 15 board. "
+            + "The first player to form an uninterrupted horizontal, vertical, "
+            + "or diagonal line of five or more marks wins.";
     }
 }
