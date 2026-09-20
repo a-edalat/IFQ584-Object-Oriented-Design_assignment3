@@ -1,5 +1,3 @@
-using System.Reflection.Metadata;
-
 namespace MultiGameApp;
 
 public class NotaktoGame : Game
@@ -122,7 +120,7 @@ public class NotaktoGame : Game
     }
 
     private bool CheckLine(
-        BlobReader board,
+        Board board,
         int startingRow,
         int startingColumn,
         int rowChange,
