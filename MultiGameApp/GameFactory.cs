@@ -4,7 +4,7 @@ public class GameFactory
 {
     public Game CreateGame(GameType gameType, GameMode gameMode, int boardSize)
     {
-        if (!Enum.IsDefined(typeof(GameMode), gameMode))
+        if (!Enum.IsDefined(gameMode))
             throw new ArgumentOutOfRangeException(nameof(gameMode), "The game mode is invalid.");
 
         return gameType switch
@@ -38,16 +38,20 @@ public class GameFactory
         List<Piece> playerTwoPieces
     )
     {
-        throw new NotImplementedException();
+        Player playerTwo =
+            mode == GameMode.HUMAN_VS_HUMAN
+                ? new HumanPlayer(2, "Player 2", playerTwoPieces)
+                : new ComputerPlayer(2, "Computer", playerTwoPieces);
+
+        return [new HumanPlayer(1, "Player 1", playerOnePieces), playerTwo];
     }
 
-    private void ValidateBoardSize(
-        int boardSize,
-        int minimumSize,
-        int? requiredSize,
-        string gameName
-    )
+    private void ValidateBoardSize(int boardSize, int requiredSize, string gameName)
     {
-        throw new NotImplementedException();
+        if (boardSize != requiredSize)
+            throw new ArgumentOutOfRangeException(
+                nameof(boardSize),
+                $"{gameName} requires a equal board size of {requiredSize}"
+            );
     }
 }
