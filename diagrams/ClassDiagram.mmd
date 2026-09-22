@@ -5,11 +5,14 @@
 
 %% but by using mermaid its then easier to edit and update for any changes than draw.io 
 
+%% top down block formatting for page oconstraints
  %%{init: {"layout": "elk", "class": {"hideEmptyMembersBox": true, "nodeSpacing": 25, "rankSpacing": 35, "diagramPadding": 8, "useMaxWidth": true}}}%%
 
+%% diagram types
 classDiagram
 direction TB
 
+%% class and method implementations
 class Program {
     <<incomplete>>
 }
@@ -225,18 +228,23 @@ class GameController {
     -_saveLoadService: SaveLoadService
 }
 
+%% connections
+%% inheritance
 Piece <|-- NumberPiece
 Piece <|-- MarkPiece
 
 Player <|-- HumanPlayer
 Player <|-- ComputerPlayer
+
 MoveStrategy <|.. WinningThenRandomStrategy
 
 Game <|-- NumericalTTTGame
 Game <|-- NotaktoGame
 Game <|-- GomokuGame
 
+%% aggegation and composition
 Player "1" o-- "1..*" Piece : owns
+
 ComputerPlayer "1" *-- "1" MoveStrategy : uses
 
 Game "1" *-- "1..3" Board : owns
@@ -244,20 +252,26 @@ Game "1" *-- "2" Player : participants
 Game "1" *-- "1" MoveHistory : history
 
 Board "1" o-- "0..*" Piece : cell contents
-MoveHistory "1" *-- "0..*" Move : records
-Move --> "1" Player : made by
-Move --> "1" Piece : places
 
+MoveHistory "1" *-- "0..*" Move : records
+
+%% dependency
 GameFactory ..> Game : creates configured game
 GameFactory ..> Board : creates
 GameFactory ..> Player : creates
 GameFactory ..> MoveStrategy : configures
 
 Program ..> GameController : starts
+
 GameController "1" o-- "0..1" Game : current game
+
+%% directed association
 GameController --> ConsoleUI
 GameController --> GameFactory
 GameController --> SaveLoadService
 
 SaveLoadService --> GameSaveData : serialises
 SaveLoadService --> GameFactory : reconstructs through
+
+Move --> "1" Player : made by
+Move --> "1" Piece : places
