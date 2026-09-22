@@ -62,13 +62,16 @@ public class HumanPlayer(int id, string name, List<Piece> availablePieces)
     }
 }
 
-public class ComputerPlayer(int id, string name, List<Piece> availablePieces)
+public class ComputerPlayer(int id, string name, List<Piece> availablePieces, MoveStrategy strategy)
     : Player(id, name, availablePieces)
 {
-    // TO DO
-    // add MoveStrategy
-    // add ChooseMove(Game)
-    // once implemented
+    private readonly MoveStrategy _strategy = strategy ?? throw new ArgumentNullException();
+
+    public Move ChooseMove(Game game)
+    {
+        return _strategy.ChooseMove(game, this);
+    }
+
     public override bool IsComputer()
     {
         return true;
