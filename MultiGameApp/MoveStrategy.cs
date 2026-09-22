@@ -14,8 +14,25 @@ public class WinningThenRandomStrategy : MoveStrategy
         _random = random ?? Random.Shared;
     }
 
-    public MoveStrategy ChooseMove(Game game, Player player)
+    public Move ChooseMove(Game game, Player player)
     {
-        // 
+        ArgumentNullException.ThrowIfNull(game);
+        ArgumentNullException.ThrowIfNull(player);
+
+        if (!ReferenceEquals(game.GetCurrentPlayer(), player))
+            throw new ArgumentException("Supplied name of player is not the current player");
+
+        var validMoves = game.GetValidMoves();
+
+        if (validMoves.Count == 0)
+            throw new InvalidOperationException("No valid moves available");
+
+        foreach (var move in validMoves)
+        {
+            if (game.WouldMoveWin(move))
+                return move;
+        }
+
+        return validMoves[_random.Next(validMoves.Count)];
     }
 }
