@@ -68,7 +68,12 @@ public class GameFactory
         Player playerTwo =
             mode == GameMode.HUMAN_VS_HUMAN
                 ? new HumanPlayer(2, "Player 2", playerTwoPieces)
-                : new ComputerPlayer(2, "Computer", playerTwoPieces);
+                : new ComputerPlayer(
+                    2,
+                    "Computer",
+                    playerTwoPieces,
+                    new WinningThenRandomStrategy()
+                );
 
         return [new HumanPlayer(1, "Player 1", playerOnePieces), playerTwo];
     }
