@@ -186,7 +186,7 @@ public class NumericalTTTGame : Game
         return sum == TargetSum;
     }
 
-    protected override GameResult EvaluateResult()
+    public override GameResult EvaluateResult()
     {
         if (HasWinningLine())
             return GetCurrentPlayerWinResult();
