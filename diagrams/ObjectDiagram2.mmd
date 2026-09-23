@@ -1,9 +1,11 @@
-%%{init: {"layout": "elk", "class": {"hideEmptyMembersBox": true, "nodeSpacing": 25, "rankSpacing": 35, "diagramPadding": 8, "useMaxWidth": true}}}%%
-
-%% Object Diagram 2: Loaded Gomoku game after four moves, ready for immediate undo.
-%% Intended restored state; save/load and move history are not implemented yet.
+%% diag type
 classDiagram
 direction TB
+
+%% formatting for space constraints
+%%{init: {"layout": "elk", "class": {"hideEmptyMembersBox": true, "nodeSpacing": 25, "rankSpacing": 35, "diagramPadding": 8, "useMaxWidth": true}}}%%
+
+%% classes
 
 class controller["controller : GameController"] {
     <<incomplete>>
@@ -107,28 +109,39 @@ class move4["move4 : Move"] {
     Piece = computerMark
 }
 
-controller o-- loadedGame : current game
+%% connections
+%% association
 controller --> saveLoadService : loads through
 controller --> factory : uses
+
 saveLoadService --> factory : reconstructs through
+%% dependency
 saveLoadService ..> loadedGame : restores
+
+move1 --> gomokuBoard : targets
+move2 --> gomokuBoard : targets
+move3 --> gomokuBoard : targets
+move4 --> gomokuBoard : targets
+
+%% composition
+computer *-- strategy : uses
 
 loadedGame *-- gomokuBoard : board 0
 loadedGame *-- human : current player
 loadedGame *-- computer : player 2
 loadedGame *-- history : move history
 
-human o-- humanMark : owns reusable mark
-computer o-- computerMark : owns reusable mark
-computer *-- strategy : uses
-gomokuBoard o-- humanMark : cells 7,7 and 8,8
-gomokuBoard o-- computerMark : cells 7,8 and 6,6
-
 history *-- move1 : first
 history *-- move2 : second
 history *-- move3 : third
 history *-- move4 : fourth - next undo
-move1 --> gomokuBoard : targets
-move2 --> gomokuBoard : targets
-move3 --> gomokuBoard : targets
-move4 --> gomokuBoard : targets
+
+%% aggregation
+controller o-- loadedGame : current game
+
+human o-- humanMark : owns reusable mark
+
+computer o-- computerMark : owns reusable mark
+
+gomokuBoard o-- humanMark : cells 7,7 and 8,8
+gomokuBoard o-- computerMark : cells 7,8 and 6,6
