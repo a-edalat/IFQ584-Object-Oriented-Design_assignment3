@@ -1,0 +1,56 @@
+sequenceDiagram
+
+%% config
+autonumber
+participant user as user : User
+participant controller as controller : GameController
+participant saveLoadService as saveLoadService : SaveLoadService
+participant factory as factory : GameFactory
+participant loadedGame as loadedGame : GomokuGame
+participant board as board : Board
+participant history as history : MoveHistory
+participant computer as computer : ComputerPlayer
+participant ui as ui : ConsoleUI
+
+%% this has the most assumptions of all the diagrams, and will most likely need the most revision after code completion 
+
+%% notes
+%% action needed
+Note over controller,saveLoadService: Incomplete - GameController, SaveLoadService and GameSaveData are not implemented.
+Note over loadedGame,history: Incomplete - Move and MoveHistory are missing, and Board's typed Piece contract is TBC.
+Note over ui: Incomplete - ConsoleUI and its display methods are not implemented.
+Note over saveLoadService,loadedGame: No restore  exists yet. Saved moves must refer to the reconstructed players and their MarkPiece objects.
+
+%% keep
+Note over loadedGame,history: Loaded state - Result = IN_PROGRESS, current player = human, moves = [move1, move2, move3, move4], cursor = 3.
+Note over computer: The O MarkPiece is reusable and stays available.
+Note over loadedGame: _currentPlayer = computer, the player who made move4.
+Note over loadedGame,history: After undo - Result = IN_PROGRESS, cursor = 2, current player = computer, move4 remains available for redo.
+
+
+%% steps
+%% load the saved game
+user->>controller: request LoadGame() (TBC)
+controller->>saveLoadService: LoadGame(gomoku-save.json) (TBC)
+saveLoadService->>saveLoadService: deserialize GameSaveData (TBC)
+saveLoadService->>factory: CreateGame(GOMOKU, HUMAN_VS_COMPUTER, 15)
+factory-->>saveLoadService: loadedGame
+saveLoadService->>loadedGame: restore saved board, moves, cursor and turn (TBC)
+saveLoadService-->>controller: loadedGame
+
+%% undo immediately without a new move
+user->>controller: undo command (TBC)
+controller->>loadedGame: UndoMove()
+loadedGame->>history: GetCurrentIndex()
+history-->>loadedGame: 3
+loadedGame->>history: UndoLastMove()
+history-->>loadedGame: move4
+loadedGame->>board: RemoveMove(move4)
+board-->>loadedGame: cell (6,6) is empty
+loadedGame->>computer: RestorePiece(move4.Piece)
+computer-->>loadedGame: return
+
+loadedGame->>loadedGame: EvaluateResult()
+loadedGame-->>controller: true
+
+controller->>ui: display restored board (TBC)

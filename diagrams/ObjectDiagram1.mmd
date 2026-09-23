@@ -1,0 +1,131 @@
+%% diag type
+classDiagram
+direction TB
+
+%% formatting for space constriants 
+%%{init: {"layout": "elk", "class": {"hideEmptyMembersBox": true, "nodeSpacing": 25, "rankSpacing": 35, "diagramPadding": 8, "useMaxWidth": true}}}%%
+
+%% classes
+class notaktoGame["notaktoGame : NotaktoGame"] {
+    Mode = HUMAN_VS_HUMAN
+    Result = IN_PROGRESS
+    _currentPlayer = player1
+    InactiveBoards = [0]
+    _symbol = X
+}
+
+class board0["board0 : Board"] {
+    Rows = 3
+    Columns = 3
+    row0 = mark1 mark1 mark2
+    row1 = empty empty empty
+    row2 = empty empty empty
+}
+note for board0 "Inactive after move4."
+%% TO ACTION
+note for board0 "Board Piece cell contract TBC - feedback raised."
+
+class board1["board1 : Board"] {
+    Rows = 3
+    Columns = 3
+    row0 = empty empty empty
+    row1 = empty mark2 empty
+    row2 = empty empty empty
+}
+
+class board2["board2 : Board"] {
+    Rows = 3
+    Columns = 3
+    row0 = empty empty empty
+    row1 = empty empty empty
+    row2 = empty empty empty
+}
+
+class player1["player1 : HumanPlayer"] {
+    Id = 1
+    Name = Player 1
+    AvailablePieces = [mark1]
+}
+
+class player2["player2 : HumanPlayer"] {
+    Id = 2
+    Name = Player 2
+    AvailablePieces = [mark2]
+}
+
+class mark1["mark1 : MarkPiece"] {
+    Symbol = X
+}
+
+class mark2["mark2 : MarkPiece"] {
+    Symbol = X
+}
+
+class history["history : MoveHistory"] {
+    <<incomplete>>
+    _currentMoveIndex = 3
+    _moves = [move1, move2, move3, move4]
+}
+
+class move1["move1 : Move"] {
+    <<incomplete>>
+    Player = player1
+    BoardIndex = 0
+    Row = 0
+    Column = 0
+    Piece = mark1
+}
+
+class move2["move2 : Move"] {
+    <<incomplete>>
+    Player = player2
+    BoardIndex = 1
+    Row = 1
+    Column = 1
+    Piece = mark2
+}
+
+class move3["move3 : Move"] {
+    <<incomplete>>
+    Player = player1
+    BoardIndex = 0
+    Row = 0
+    Column = 1
+    Piece = mark1
+}
+
+class move4["move4 : Move"] {
+    <<incomplete>>
+    Player = player2
+    BoardIndex = 0
+    Row = 0
+    Column = 2
+    Piece = mark2
+}
+
+%% connections
+%% composition
+notaktoGame *-- board0 : board 0
+notaktoGame *-- board1 : board 1
+notaktoGame *-- board2 : board 2
+notaktoGame *-- player1 : current player
+notaktoGame *-- player2 : player 2
+notaktoGame *-- history : move history
+
+history *-- move1 : first
+history *-- move2 : second
+history *-- move3 : third
+history *-- move4 : fourth
+
+%% aggregation
+player1 o-- mark1 : owns reusable mark
+player2 o-- mark2 : owns reusable mark
+board0 o-- mark1 : cells 0,0 and 0,1
+board0 o-- mark2 : cell 0,2
+board1 o-- mark2 : cell 1,1
+
+%% association
+move1 --> board0 : targets
+move2 --> board1 : targets
+move3 --> board0 : targets
+move4 --> board0 : targets

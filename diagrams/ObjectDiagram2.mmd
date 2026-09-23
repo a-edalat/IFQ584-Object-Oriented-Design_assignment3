@@ -1,0 +1,147 @@
+%% diag type
+classDiagram
+direction TB
+
+%% formatting for space constraints
+%%{init: {"layout": "elk", "class": {"hideEmptyMembersBox": true, "nodeSpacing": 25, "rankSpacing": 35, "diagramPadding": 8, "useMaxWidth": true}}}%%
+
+%% classes
+
+class controller["controller : GameController"] {
+    <<incomplete>>
+    _currentGame = loadedGame
+    _factory = factory
+    _saveLoadService = saveLoadService
+}
+
+class saveLoadService["saveLoadService : SaveLoadService"] {
+    <<incomplete>>
+    _factory = factory
+    _filePath = gomoku-save.json
+}
+note for saveLoadService "Loading and reconstruction are not implemented yet."
+
+class factory["factory : GameFactory"]
+
+class loadedGame["loadedGame : GomokuGame"] {
+    BoardSize = 15
+    WinningLength = 5
+    Mode = HUMAN_VS_COMPUTER
+    Result = IN_PROGRESS
+    IsGameOver = false
+    _currentPlayer = human
+}
+
+class gomokuBoard["gomokuBoard : Board"] {
+    Rows = 15
+    Columns = 15
+    cell7_7 = humanMark
+    cell7_8 = computerMark
+    cell8_8 = humanMark
+    cell6_6 = computerMark
+    all other cells = empty
+}
+note for gomokuBoard "Typed Piece cells and public dimensions TBC - current Board stores integers."
+
+class human["human : HumanPlayer"] {
+    Id = 1
+    Name = Player 1
+    AvailablePieces = [humanMark]
+}
+
+class computer["computer : ComputerPlayer"] {
+    Id = 2
+    Name = Computer
+    AvailablePieces = [computerMark]
+    _strategy = strategy
+}
+
+class humanMark["humanMark : MarkPiece"] {
+    Symbol = X
+}
+
+class computerMark["computerMark : MarkPiece"] {
+    Symbol = O
+}
+
+class strategy["strategy : WinningThenRandomStrategy"]
+
+class history["history : MoveHistory"] {
+    <<incomplete>>
+    _currentMoveIndex = 3
+    _moves = [move1, move2, move3, move4]
+}
+note for history "move4 can be undone immediately; no new move is needed."
+
+class move1["move1 : Move"] {
+    <<incomplete>>
+    Player = human
+    BoardIndex = 0
+    Row = 7
+    Column = 7
+    Piece = humanMark
+}
+
+class move2["move2 : Move"] {
+    <<incomplete>>
+    Player = computer
+    BoardIndex = 0
+    Row = 7
+    Column = 8
+    Piece = computerMark
+}
+
+class move3["move3 : Move"] {
+    <<incomplete>>
+    Player = human
+    BoardIndex = 0
+    Row = 8
+    Column = 8
+    Piece = humanMark
+}
+
+class move4["move4 : Move"] {
+    <<incomplete>>
+    Player = computer
+    BoardIndex = 0
+    Row = 6
+    Column = 6
+    Piece = computerMark
+}
+
+%% connections
+%% association
+controller --> saveLoadService : loads through
+controller --> factory : uses
+
+saveLoadService --> factory : reconstructs through
+%% dependency
+saveLoadService ..> loadedGame : restores
+
+move1 --> gomokuBoard : targets
+move2 --> gomokuBoard : targets
+move3 --> gomokuBoard : targets
+move4 --> gomokuBoard : targets
+
+%% composition
+computer *-- strategy : uses
+
+loadedGame *-- gomokuBoard : board 0
+loadedGame *-- human : current player
+loadedGame *-- computer : player 2
+loadedGame *-- history : move history
+
+history *-- move1 : first
+history *-- move2 : second
+history *-- move3 : third
+history *-- move4 : fourth - next undo
+
+%% aggregation
+controller o-- loadedGame : current game
+
+human o-- humanMark : owns reusable mark
+
+computer o-- computerMark : owns reusable mark
+
+gomokuBoard o-- humanMark : cells 7,7 and 8,8
+gomokuBoard o-- computerMark : cells 7,8 and 6,6

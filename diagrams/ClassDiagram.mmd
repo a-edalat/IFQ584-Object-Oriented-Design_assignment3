@@ -1,0 +1,278 @@
+%% you can view the diagram by:
+%% - install the VS code extension: vstirbu.vscode-mermaid-preview
+%% - add to a Markdown file and add a ```mermaid code block
+%% - upload here https://mermaideditor.com/tools/mermaid-to-pdf
+
+%% but by using mermaid its then easier to edit and update for any changes than draw.io 
+
+%% diagram type
+classDiagram
+direction TB
+
+%% top down block formatting for page oconstraints
+ %%{init: {"layout": "elk", "class": {"hideEmptyMembersBox": true, "nodeSpacing": 25, "rankSpacing": 35, "diagramPadding": 8, "useMaxWidth": true}}}%%
+
+
+%% class and method implementations
+class Program {
+    <<incomplete>>
+}
+
+
+class Piece {
+    <<abstract>>
+    +DisplayValue(): string
+    +IsReusable(): bool
+}
+
+class NumberPiece {
+    -_value: int
+    +Value: int
+    +DisplayValue(): string
+    +IsReusable(): bool
+}
+
+class MarkPiece {
+    -_symbol: string
+    +Symbol: string
+    +DisplayValue(): string
+    +IsReusable(): bool
+}
+
+class Player {
+    <<abstract>>
+    -_availablePieces: List~Piece~
+    +Id: int
+    +Name: string
+    +AvailablePieces: IReadOnlyList~Piece~
+    +HasPiece(piece: Piece): bool
+    +UsePiece(piece: Piece): bool
+    +RestorePiece(piece: Piece): void
+    +IsComputer(): bool
+}
+
+class HumanPlayer {
+    +IsComputer(): bool
+}
+
+class ComputerPlayer {
+    -_strategy: MoveStrategy
+    +ChooseMove(game: Game): Move
+    +IsComputer(): bool
+}
+
+class MoveStrategy {
+    <<interface>>
+    +ChooseMove(game: Game, player: Player): Move
+}
+
+class WinningThenRandomStrategy {
+    -_random: Random
+    +ChooseMove(game: Game, player: Player): Move
+}
+
+class Move {
+    <<incomplete>>
+    +Player: Player
+    +BoardIndex: int
+    +Row: int
+    +Column: int
+    +Piece: Piece
+}
+
+class MoveHistory {
+    <<incomplete>>
+    -_moves: List~Move~
+    -_currentMoveIndex: int
+}
+
+class Board {
+    -_rows: int
+    -_columns: int
+    -_cells: Piece?[]
+    +Rows: int
+    +Columns: int
+    +IsWithinBoard(row: int, column: int): bool
+    +IsCellEmpty(row: int, column: int): bool
+    +GetCell(row: int, column: int): Piece?
+    +PlaceMove(move: Move): void
+    +RemoveMove(move: Move): void
+    +IsFull(): bool
+    -SetCell(row: int, column: int, piece: Piece?): void
+}
+note for Board "TBC - Feedback raised"
+
+class Game {
+    <<abstract>>
+    -_boards: List~Board~
+    -_players: List~Player~
+    -_moveHistory: MoveHistory
+    -_currentPlayer: Player
+    +Mode: GameMode
+    +Result: GameResult
+    +IsGameOver: bool
+    #IsValidMove(move: Move): bool
+    +MakeMove(move: Move): bool
+    +ApplyMove(move: Move): void
+    +UndoMove(): bool
+    +RedoMove(): bool
+    #SwitchPlayer(): void
+    +GetCurrentPlayer(): Player
+    +GetValidMoves(): List~Move~
+    +WouldMoveWin(move: Move): bool
+    +EvaluateResult(): GameResult
+    +GetHelpText(): string
+    +TakeTurn(): void
+    +StartGame(): void
+}
+note for Game "TBC - awaiting Move + MoveHistory + GameController."
+
+class NumericalTTTGame {
+    -_board: Board
+    -_players: List~Player~
+    +BoardSize: int
+    +TargetSum: int
+    -ValidatePlayers(players: List~Player~): List~Player~
+    -ValidatePlayerNumbers(player: Player, shouldBeOdd: bool, playerName: string): void
+    -CreateBoardList(board: Board): List~Board~
+    +GetValidMoves(): List~Move~
+    -GetAvailableNumbers(player: Player): List~NumberPiece~
+    #IsValidMove(move: Move): bool
+    -PlayerOwnsNumber(player: Player, value: int): bool
+    -IsNumberUnused(value: int): bool
+    +WouldMoveWin(move: Move): bool
+    -HasWinningLine(): bool
+    -CheckLineSum(row: int, column: int, rowChange: int, columnChange: int): bool
+    +EvaluateResult(): GameResult
+    -GetCurrentPlayerWinResult(): GameResult
+    +GetHelpText(): string
+}
+
+class NotaktoGame {
+    +RequiredBoards: int
+    +BoardSize: int
+    -_boards: List~Board~
+    -_players: List~Player~
+    -_inactiveBoards: List~int~
+    -_symbol: string
+    +InactiveBoards: IReadOnlyList~int~
+    -ValidatePlayers(players: List~Player~): List~Player~
+    -ValidateBoards(boards: List~Board~): List~Board~
+    -GetPlayerMark(player: Player): MarkPiece
+    +GetValidMoves(): List~Move~
+    #IsValidMove(move: Move): bool
+    -CheckBoardHasLine(board: Board): bool
+    -CheckLine(board: Board, row: int, column: int, rowChange: int, columnChange: int): bool
+    -RefreshInactiveBoards(): void
+    +WouldMoveWin(move: Move): bool
+    +EvaluateResult(): GameResult
+    +GetHelpText(): string
+}
+
+class GomokuGame {
+    +BoardSize: int
+    +WinningLength: int
+    -_board: Board
+    -_players: List~Player~
+    -Directions: coordinatePair[]
+    -ValidatePlayers(players: List~Player~): List~Player~
+    -ValidatePlayerMarks(): void
+    -GetPlayerMark(player: Player): MarkPiece
+    -CreateBoardList(board: Board): List~Board~
+    +GetValidMoves(): List~Move~
+    #IsValidMove(move: Move): bool
+    +WouldMoveWin(move: Move): bool
+    -HasWinningLine(row: int, column: int, symbol: string): bool
+    -CountDirection(row: int, column: int, rowChange: int, columnChange: int, symbol: string): int
+    +EvaluateResult(): GameResult
+    -GetWinResult(winningSymbol: string): GameResult
+    +GetHelpText(): string
+}
+
+class GameFactory {
+    +CreateGame(gameType: GameType, gameMode: GameMode, boardSize: int): Game
+    -CreateNumericalTTTGame(mode: GameMode, boardSize: int): NumericalTTTGame
+    -CreateNotaktoGame(mode: GameMode, boardSize: int): NotaktoGame
+    -CreateGomokuGame(mode: GameMode, boardSize: int): GomokuGame
+    -CreatePlayers(mode: GameMode, playerOnePieces: List~Piece~, playerTwoPieces: List~Piece~): List~Player~
+    -ValidateBoardSize(boardSize: int, requiredSize: int, gameName: string): void
+}
+
+class GameSaveData {
+    <<incomplete>>
+    +GameType: GameType
+    +Mode: GameMode
+    +BoardSize: int
+    +Players: List~Player~
+    +Boards: List~Board~
+    +Moves: List~Move~
+    +HistoryCursor: int
+    +CurrentPlayerId: int
+    +Result: GameResult
+}
+
+class SaveLoadService {
+    <<incomplete>>
+    -_factory: GameFactory
+    -_filePath: string
+}
+
+class ConsoleUI {
+    <<incomplete>>
+}
+
+class GameController {
+    <<incomplete>>
+    -_currentGame: Game
+    -_ui: ConsoleUI
+    -_factory: GameFactory
+    -_saveLoadService: SaveLoadService
+}
+
+%% connections
+%% inheritance
+Piece <|-- NumberPiece
+Piece <|-- MarkPiece
+
+Player <|-- HumanPlayer
+Player <|-- ComputerPlayer
+
+MoveStrategy <|.. WinningThenRandomStrategy
+
+Game <|-- NumericalTTTGame
+Game <|-- NotaktoGame
+Game <|-- GomokuGame
+
+%% aggegation and composition
+Player "1" o-- "1..*" Piece : owns
+
+ComputerPlayer "1" *-- "1" MoveStrategy : uses
+
+Game "1" *-- "1..3" Board : owns
+Game "1" *-- "2" Player : participants
+Game "1" *-- "1" MoveHistory : history
+
+Board "1" o-- "0..*" Piece : cell contents
+
+MoveHistory "1" *-- "0..*" Move : records
+
+%% dependency
+GameFactory ..> Game : creates configured game
+GameFactory ..> Board : creates
+GameFactory ..> Player : creates
+GameFactory ..> MoveStrategy : configures
+
+Program ..> GameController : starts
+
+GameController "1" o-- "0..1" Game : current game
+
+%% directed association
+GameController --> ConsoleUI
+GameController --> GameFactory
+GameController --> SaveLoadService
+
+SaveLoadService --> GameSaveData : serialises
+SaveLoadService --> GameFactory : reconstructs through
+
+Move --> "1" Player : made by
+Move --> "1" Piece : places
