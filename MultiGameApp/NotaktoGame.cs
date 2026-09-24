@@ -47,11 +47,7 @@ public class NotaktoGame : Game
 
         foreach (var board in boards)
         {
-            if (
-                !board.IsWithinBoard(BoardSize - 1, BoardSize - 1)
-                || board.IsWithinBoard(BoardSize, 0)
-                || board.IsWithinBoard(0, BoardSize)
-            )
+            if (!board.HasSize(BoardSize, BoardSize))
                 throw new ArgumentException("Each Notakto board must be 3 x 3");
         }
 
