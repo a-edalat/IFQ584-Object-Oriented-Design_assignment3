@@ -15,12 +15,12 @@ public class NumericalTTTGame : Game
     {
         _players = players;
         _board = board;
-        BoardSize = board.Rows;
+        BoardSize = GetBoardSize(board);
         TargetSum = BoardSize * (BoardSize * BoardSize + 1) / 2;
 
         // true / false for odd / even
         ValidatePlayerNumbers(_players[0], true, "Player one");
-        ValidatePlayerNumbers(_players[1], false, "Player one");
+        ValidatePlayerNumbers(_players[1], false, "Player two");
     }
 
     private static List<Player> ValidatePlayers(List<Player> players)
@@ -66,12 +66,25 @@ public class NumericalTTTGame : Game
     {
         ArgumentNullException.ThrowIfNull(board);
 
-        if (board.Rows < 3 || board.Rows != board.Columns)
+        GetBoardSize(board);
+        return [board];
+    }
+
+    // helper method as Numerical TTT has variable board size
+    private static int GetBoardSize(Board board)
+    {
+        ArgumentNullException.ThrowIfNull(board);
+
+        int size = 0;
+        while (board.IsWithinBoard(size, 0))
+            size++;
+
+        if (size < 3 || !board.HasSize(size, size))
             throw new ArgumentException(
-                "Numerical Tic-Tac-Toe requires a square board, of at least 3x3."
+                "Numerical Tic-Tac-Toe requires a square board of at least 3x3"
             );
 
-        return [board];
+        return size;
     }
 
     public override List<Move> GetValidMoves()
