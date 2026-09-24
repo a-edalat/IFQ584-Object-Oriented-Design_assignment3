@@ -64,7 +64,11 @@ public class GomokuGame : Game
     {
         ArgumentNullException.ThrowIfNull(board);
 
-        if (board.Rows != BoardSize || board.Columns != BoardSize)
+        if (
+            !board.IsWithinBoard(BoardSize - 1, BoardSize - 1)
+            || board.IsWithinBoard(BoardSize, 0)
+            || board.IsWithinBoard(0, BoardSize)
+        )
             throw new ArgumentException("Gomoku requires a 15 by 15 board.", nameof(board));
 
         return [board];
@@ -77,9 +81,9 @@ public class GomokuGame : Game
         var player = GetCurrentPlayer();
         var mark = GetPlayerMark(player);
 
-        for (int row = 0; row < _board.Rows; row++)
+        for (int row = 0; row < BoardSize; row++)
         {
-            for (int column = 0; column < _board.Columns; column++)
+            for (int column = 0; column < BoardSize; column++)
             {
                 if (_board.IsCellEmpty(row, column))
                     validMoves.Add(new Move(player, 0, row, column, mark));
@@ -153,9 +157,9 @@ public class GomokuGame : Game
     // game progress
     public override GameResult EvaluateResult()
     {
-        for (int row = 0; row < _board.Rows; row++)
+        for (int row = 0; row < BoardSize; row++)
         {
-            for (int column = 0; column < _board.Columns; column++)
+            for (int column = 0; column < BoardSize; column++)
             {
                 if (
                     _board.GetCell(row, column) is MarkPiece mark
