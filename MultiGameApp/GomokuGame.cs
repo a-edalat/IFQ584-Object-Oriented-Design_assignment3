@@ -64,11 +64,7 @@ public class GomokuGame : Game
     {
         ArgumentNullException.ThrowIfNull(board);
 
-        if (
-            !board.IsWithinBoard(BoardSize - 1, BoardSize - 1)
-            || board.IsWithinBoard(BoardSize, 0)
-            || board.IsWithinBoard(0, BoardSize)
-        )
+        if (!board.HasSize(BoardSize, BoardSize))
             throw new ArgumentException("Gomoku requires a 15 by 15 board.", nameof(board));
 
         return [board];
