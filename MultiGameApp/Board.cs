@@ -5,9 +5,9 @@ namespace MultiGameApp;
 public class Board
 {
     // fields
-    private int rows;
-    private int cols;
-    private int[] cells;
+    private readonly int rows;
+    private readonly int cols;
+    private readonly Piece?[] cells;
 
     // constructor
     public Board(int rows, int cols)
@@ -25,7 +25,7 @@ public class Board
 
         this.rows = rows;
         this.cols = cols;
-        cells = new int[rows * cols]; // array for number of cells
+        cells = new Piece?[rows * cols]; 
     }
 
     // Methods
@@ -49,18 +49,18 @@ public class Board
         {
             throw new ArgumentOutOfRangeException();
         }
-        int index = row * cols + col;
-        return cells[index] == 0;
+        return GetCell(row, col) is null;
     }
 
     public void PlaceMove(Move move)
     {
-        ArgumentNullException.ThrowIfNull(move); //Making sure move is not null
+        ArgumentNullException.ThrowIfNull(move); 
+        ArgumentNullException.ThrowIfNull(move.Piece);//Making sure move is not null
 
         // first extracting row, column and value
         int row = move.GetRow();
         int col = move.GetColumn();
-        int val = move.GetValue();
+        Piece val = move.GetValue();
 
         if (IsWithinBoard(row, col) == false)
         {
@@ -78,7 +78,8 @@ public class Board
 
     public void RemoveMove(Move move)
     {
-        ArgumentNullException.ThrowIfNull(move); //Making sure move is not null
+        ArgumentNullException.ThrowIfNull(move);
+        ArgumentNullException.ThrowIfNull(move.Piece); //Making sure move is not null
 
         // first extracting row, column and value
         int row = move.GetRow();
@@ -93,27 +94,25 @@ public class Board
             throw new InvalidOperationException();
         }
 
-        SetCell(row, col, 0);
+        SetCell(row, col, null);
     }
 
     public bool IsFull()
     {
-        return Array.IndexOf(cells, 0) == -1; //check if cell with value zero is not found
+        return Array.IndexOf(cells, null) < 0;
     }
 
-    private void SetCell(int row, int col, int value)
+    private void SetCell(int row, int col, Piece? piece)
     {
-        int index = row * cols + col; //cols is the number of column in the board
-        cells[index] = value;
+        cells[row * cols + col] = piece;
     }
 
-    public int GetCell(int row, int col)
+    public Piece? GetCell(int row, int col)
     {
         if (!IsWithinBoard(row, col))
         {
             throw new ArgumentOutOfRangeException();
         }
-        int index = row * cols + col; //cols is the number of column in the board
-        return cells[index];
+        return cells[row * cols + col];
     }
 } // closes Board class
