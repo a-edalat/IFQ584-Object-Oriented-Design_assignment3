@@ -81,9 +81,14 @@ class Move {
 }
 
 class MoveHistory {
-    <<incomplete>>
     -_moves: List~Move~
     -_currentMoveIndex: int
+    +ClearRedoHistory(): void
+    +AddMove(Move move): void
+    +GetMoves(): List<Move>
+    +GetCurrentIndex(): int
+    +UndoLastMove(): Move
+    +RedoLastMove(): Move
 }
 
 class Board {
