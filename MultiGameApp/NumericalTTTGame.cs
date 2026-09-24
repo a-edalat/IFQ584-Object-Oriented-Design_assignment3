@@ -70,6 +70,7 @@ public class NumericalTTTGame : Game
         return [board];
     }
 
+    // helper method as Numerical TTT has variable board size
     private static int GetBoardSize(Board board)
     {
         ArgumentNullException.ThrowIfNull(board);
@@ -78,7 +79,7 @@ public class NumericalTTTGame : Game
         while (board.IsWithinBoard(size, 0))
             size++;
 
-        if (size < 3 || !board.IsWithinBoard(0, size - 1) || board.IsWithinBoard(0, size))
+        if (size < 3 || !board.HasSize(size, size))
             throw new ArgumentException(
                 "Numerical Tic-Tac-Toe requires a square board of at least 3x3"
             );
