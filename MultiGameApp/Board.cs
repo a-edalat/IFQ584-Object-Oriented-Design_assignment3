@@ -25,11 +25,12 @@ public class Board
 
         this.rows = rows;
         this.cols = cols;
-        cells = new Piece?[rows * cols]; 
+        cells = new Piece?[rows * cols];
     }
 
     // Methods
 
+    // used for Numerical TTT as it has variable board size.
     public bool IsWithinBoard(int row, int col)
     {
         if (row >= rows || row < 0)
@@ -43,6 +44,12 @@ public class Board
         return true;
     }
 
+    // used for Gomoku, Notakto as they have fixed board size.
+    public bool HasSize(int expectedRows, int expectedColumns)
+    {
+        return rows == expectedRows && cols == expectedColumns;
+    }
+
     public bool IsCellEmpty(int row, int col)
     {
         if (IsWithinBoard(row, col) == false)
@@ -54,8 +61,8 @@ public class Board
 
     public void PlaceMove(Move move)
     {
-        ArgumentNullException.ThrowIfNull(move); 
-        ArgumentNullException.ThrowIfNull(move.Piece);//Making sure move is not null
+        ArgumentNullException.ThrowIfNull(move);
+        ArgumentNullException.ThrowIfNull(move.Piece); //Making sure move is not null
 
         // first extracting row, column and value
         int row = move.GetRow();
