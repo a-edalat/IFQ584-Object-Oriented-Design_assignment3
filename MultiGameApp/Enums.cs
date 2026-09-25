@@ -20,12 +20,3 @@ public enum GameResult
     PLAYER_ONE_WIN,
     PLAYER_TWO_WIN,
 }
-
-public enum CommandType
-{
-    MOVE,
-    UNDO,
-    REDO,
-    SAVE,
-    HELP,
-}
