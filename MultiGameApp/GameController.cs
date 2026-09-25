@@ -510,6 +510,10 @@ public class GameController
         Console.WriteLine($"Game: {currentGame.GetType().Name}");
 
         DisplayBoards(currentGame);
+        if (currentGame is NumericalTTTGame numericalGame)
+            Console.WriteLine(
+                $"Target: make {numericalGame.TargetSum} in a row, column, or diagonal."
+            );
 
         Console.WriteLine($"Current player: {currentGame.GetCurrentPlayer().Name}");
 
@@ -518,11 +522,23 @@ public class GameController
 
     public void DisplayResult()
     {
-        if (currentGame == null)
+        if (currentGame is null)
+            return;
+
+        if (currentGame.Result == GameResult.DRAW)
         {
+            Console.WriteLine("Game result: Draw.");
             return;
         }
-        Console.WriteLine($"Game result: {currentGame.Result}");
+
+        if (
+            currentGame.Result == GameResult.PLAYER_ONE_WIN
+            || currentGame.Result == GameResult.PLAYER_TWO_WIN
+        )
+        {
+            int winnerIndex = currentGame.Result == GameResult.PLAYER_ONE_WIN ? 0 : 1;
+            Console.WriteLine($"Game result: {currentGame.Players[winnerIndex].Name} wins.");
+        }
     }
 
     private static void DisplayBoards(Game game)
