@@ -90,9 +90,15 @@ public class GameController
             return;
         }
 
-        currentGame = saveManager.LoadGame();
-
-        Console.WriteLine("The game was loaded.");
+        try
+        {
+            currentGame = saveManager.LoadGame();
+            Console.WriteLine("The game was loaded.");
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine($"Load failed({e.GetType().Name}): {e.Message}");
+        }
     }
 
     public string SelectGameType()
