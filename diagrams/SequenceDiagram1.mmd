@@ -8,57 +8,32 @@ participant strategy as strategy : WinningThenRandomStrategy
 participant game as game : GomokuGame
 participant board as board : Board
 participant history as history : MoveHistory
-participant ui as ui : ConsoleUI
-
-%% notes
-%% action needed
-Note over controller: Incomplete - GameController is not implemented and would coordinate the turn.
-Note over history: Incomplete - MoveHistory is not implemented.
-Note over ui: Incomplete - ConsoleUI and its display methods are not implemented.
-Note over game,strategy: Incomplete - GetValidMoves creates Move objects with computer's reusable MarkPiece.
-Note over board: Typed Piece cells and public dimensions are TBC.
-
-
-%% keep
-Note over game,board: Computer is Player 2 and a legal O move completes five in a row.
-Note over computer: The MarkPiece is reusable and remains available.
-Note over game: Result = PLAYER_TWO_WIN and IsGameOver = true. No player switch follows a win.
 
 %% steps
+Note over controller,game: Computer is Player 2 and a legal O move is available that completes five in a row.
+controller->>controller: MakeCurrentPlayerMove()
 controller->>computer: ChooseMove(game)
 computer->>strategy: ChooseMove(game, computer)
-strategy->>game: GetCurrentPlayer()
-game-->>strategy: computer
 strategy->>game: GetValidMoves()
-game-->>strategy: validMoves
 
-loop Each candidate until an immediate winning move is found
+loop Cell candidates until an immediate win is found
     strategy->>game: WouldMoveWin(candidate)
-    game->>game: IsValidMove(candidate)
-    game->>game: HasWinningLine(row, column, O)
+    game->>game: HasWinningLine(row, column, 0)
     game-->>strategy: true or false
 end
-
 strategy-->>computer: winningMove
 computer-->>controller: winningMove
 
 controller->>game: MakeMove(winningMove)
-game->>game: IsValidMove(winningMove)
-game->>computer: UsePiece(winningMove.Piece)
-computer-->>game: true
-
-
-game->>game: ApplyMove(winningMove)
 game->>board: PlaceMove(winningMove)
-board-->>game: placed
+game->>computer: UsePiece(winningMove.GetPiece())
+Note over computer: Reusable O mark remains available throughout.
+
 game->>history: AddMove(winningMove)
-history-->>game: recorded
 game->>game: EvaluateResult()
-game->>board: GetCell(row, column)
-board-->>game: computer's MarkPiece
-game->>game: HasWinningLine(row, column, O)
-game->>game: GetWinResult(O)
+Note over game: Result = PLAYER_TWO_WIN. No player switch due to win.
 game-->>controller: true
 
-%% NEED TO CONFIRM THIS STEP
-controller->>ui: display final board and result (TBC)
+Note over controller: On the next Run tick, these methods print the board/result
+controller->>controller: DisplayGame()
+controller->>controller: DisplayResult()
