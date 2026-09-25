@@ -1,10 +1,3 @@
-%% you can view the diagram by:
-%% - install the VS code extension: vstirbu.vscode-mermaid-preview
-%% - add to a Markdown file and add a ```mermaid code block
-%% - upload here https://mermaideditor.com/tools/mermaid-to-pdf
-
-%% but by using mermaid its then easier to edit and update for any changes than draw.io 
-
 %% diagram type
 classDiagram
 direction TB
@@ -15,7 +8,7 @@ direction TB
 
 %% class and method implementations
 class Program {
-    <<incomplete>>
+    -Main(): void
 }
 
 
@@ -28,6 +21,7 @@ class Piece {
 class NumberPiece {
     -_value: int
     +Value: int
+    +NumberPiece(value: int)
     +DisplayValue(): string
     +IsReusable(): bool
 }
@@ -35,6 +29,7 @@ class NumberPiece {
 class MarkPiece {
     -_symbol: string
     +Symbol: string
+    +MarkPiece(symbol: string)
     +DisplayValue(): string
     +IsReusable(): bool
 }
@@ -45,6 +40,7 @@ class Player {
     +Id: int
     +Name: string
     +AvailablePieces: IReadOnlyList~Piece~
+    #Player(id: int, name: string, availablePieces: List~Piece~)
     +HasPiece(piece: Piece): bool
     +UsePiece(piece: Piece): bool
     +RestorePiece(piece: Piece): void
@@ -52,11 +48,13 @@ class Player {
 }
 
 class HumanPlayer {
+    +HumanPlayer(id: int, name: string, availablePieces: List~Piece~)
     +IsComputer(): bool
 }
 
 class ComputerPlayer {
     -_strategy: MoveStrategy
+    +ComputerPlayer(id: int, name: string, availablePieces: List~Piece~, strategy: MoveStrategy)
     +ChooseMove(game: Game): Move
     +IsComputer(): bool
 }
@@ -68,21 +66,28 @@ class MoveStrategy {
 
 class WinningThenRandomStrategy {
     -_random: Random
+    +WinningThenRandomStrategy(random: Random?)
     +ChooseMove(game: Game, player: Player): Move
 }
 
 class Move {
-    <<incomplete>>
-    +Player: Player
-    +BoardIndex: int
-    +Row: int
-    +Column: int
-    +Piece: Piece
+    -player: Player
+    -boardIndex: int
+    -row: int
+    -column: int
+    -piece: Piece
+    +Move(player: Player, boardIndex: int, row: int, column: int, piece: Piece)
+    +GetPlayer(): Player
+    +GetBoardIndex(): int
+    +GetRow(): int
+    +GetColumn(): int
+    +GetPiece(): Piece
 }
 
 class MoveHistory {
     -_moves: List~Move~
     -_currentMoveIndex: int
+    +MoveHistory(moves: List~Move~, currentMoveIndex: int)
     +ClearRedoHistory(): void
     +AddMove(Move move): void
     +GetMoves(): List<Move>
@@ -92,20 +97,20 @@ class MoveHistory {
 }
 
 class Board {
-    -_rows: int
-    -_columns: int
-    -_cells: Piece?[]
-    +Rows: int
-    +Columns: int
-    +IsWithinBoard(row: int, column: int): bool
-    +IsCellEmpty(row: int, column: int): bool
-    +GetCell(row: int, column: int): Piece?
+    -rows: int
+    -columns: int
+    -cells: Piece?[]
+    +Board(rows: int, cols: int)
+    +IsWithinBoard(row: int, col: int): bool
+    +HasSize(expectedRows: int, expectedColumns: int): bool
+    +IsCellEmpty(row: int, col: int): bool
     +PlaceMove(move: Move): void
     +RemoveMove(move: Move): void
     +IsFull(): bool
     -SetCell(row: int, column: int, piece: Piece?): void
+    +GetCell(row: int, column: int): Piece?
+    +GetDimensions(): (int Rows, int Columns)
 }
-note for Board "TBC - Feedback raised"
 
 class Game {
     <<abstract>>
@@ -116,9 +121,13 @@ class Game {
     +Mode: GameMode
     +Result: GameResult
     +IsGameOver: bool
+    +Boards: IReadOnlyList~Board~
+    +Players: IReadOnlyList~Player~
+    +Moves: IReadOnlyList~Move~
+    +CurrentMoveIndex: int
+    +Game(players: List~players~, boards: List~Board~, mode: GameMode)
     #IsValidMove(move: Move): bool
     +MakeMove(move: Move): bool
-    +ApplyMove(move: Move): void
     +UndoMove(): bool
     +RedoMove(): bool
     #SwitchPlayer(): void
@@ -127,19 +136,19 @@ class Game {
     +WouldMoveWin(move: Move): bool
     +EvaluateResult(): GameResult
     +GetHelpText(): string
-    +TakeTurn(): void
-    +StartGame(): void
 }
-note for Game "TBC - awaiting Move + MoveHistory + GameController."
 
 class NumericalTTTGame {
     -_board: Board
     -_players: List~Player~
+    +MaxBoardSize: int
     +BoardSize: int
     +TargetSum: int
+    +NumericalTTTGame(players: List~Player~, board: Board, mode: GameMode)
     -ValidatePlayers(players: List~Player~): List~Player~
     -ValidatePlayerNumbers(player: Player, shouldBeOdd: bool, playerName: string): void
     -CreateBoardList(board: Board): List~Board~
+    -GetBoardSize(board: Board): int
     +GetValidMoves(): List~Move~
     -GetAvailableNumbers(player: Player): List~NumberPiece~
     #IsValidMove(move: Move): bool
@@ -147,7 +156,7 @@ class NumericalTTTGame {
     -IsNumberUnused(value: int): bool
     +WouldMoveWin(move: Move): bool
     -HasWinningLine(): bool
-    -CheckLineSum(row: int, column: int, rowChange: int, columnChange: int): bool
+    -CheckLineSum(startingRow: int, startingColumn: int, rowChange: int, columnChange: int): bool
     +EvaluateResult(): GameResult
     -GetCurrentPlayerWinResult(): GameResult
     +GetHelpText(): string
@@ -167,7 +176,7 @@ class NotaktoGame {
     +GetValidMoves(): List~Move~
     #IsValidMove(move: Move): bool
     -CheckBoardHasLine(board: Board): bool
-    -CheckLine(board: Board, row: int, column: int, rowChange: int, columnChange: int): bool
+    -CheckLine(board: Board, startingRow: int, startingColumn: int, rowChange: int, columnChange: int): bool
     -RefreshInactiveBoards(): void
     +WouldMoveWin(move: Move): bool
     +EvaluateResult(): GameResult
@@ -179,7 +188,8 @@ class GomokuGame {
     +WinningLength: int
     -_board: Board
     -_players: List~Player~
-    -Directions: coordinatePair[]
+    -Directions: (int Row, int Column)[]
+    +GomokuGame(players: List~Player~, board: Board, mode: GameMode)
     -ValidatePlayers(players: List~Player~): List~Player~
     -ValidatePlayerMarks(): void
     -GetPlayerMark(player: Player): MarkPiece
@@ -188,7 +198,7 @@ class GomokuGame {
     #IsValidMove(move: Move): bool
     +WouldMoveWin(move: Move): bool
     -HasWinningLine(row: int, column: int, symbol: string): bool
-    -CountDirection(row: int, column: int, rowChange: int, columnChange: int, symbol: string): int
+    -CountDirection(startingRow: int, startingColumn: int, rowChange: int, columnChange: int, symbol: string): int
     +EvaluateResult(): GameResult
     -GetWinResult(winningSymbol: string): GameResult
     +GetHelpText(): string
@@ -203,35 +213,43 @@ class GameFactory {
     -ValidateBoardSize(boardSize: int, requiredSize: int, gameName: string): void
 }
 
-class GameSaveData {
-    <<incomplete>>
-    +GameType: GameType
-    +Mode: GameMode
-    +BoardSize: int
-    +Players: List~Player~
-    +Boards: List~Board~
-    +Moves: List~Move~
-    +HistoryCursor: int
-    +CurrentPlayerId: int
-    +Result: GameResult
+class SaveManager {
+    -filePath: string
+    -gameFactory: GameFactory 
+    +SaveManager(filePath: string, gameFactory: GameFactory)
+    +SaveGame(game: Game): void
+    +LoadGame(): Game
+    +FileExists(): bool
+    -FindReplayMove(game: Game, savedMove: JsonElement): Move?
+    -ReadInt(item: JsonElementl, propertyName: string): int
+    -ReadBool(item: JsonElement, propertyName: string): bool
+    -ReadString(item: Jsonelement, propertyName: string): string
 }
 
-class SaveLoadService {
-    <<incomplete>>
-    -_factory: GameFactory
-    -_filePath: string
-}
-
-class ConsoleUI {
-    <<incomplete>>
+class Help {
+    +Display(game: Game?): void
 }
 
 class GameController {
-    <<incomplete>>
-    -_currentGame: Game
-    -_ui: ConsoleUI
-    -_factory: GameFactory
-    -_saveLoadService: SaveLoadService
+    -currentGame: Game?
+    -saveManager: SaveManager
+    -help: Help
+    -gameFactory: GameFactory
+    +GameController(saveManager: SaveManager, help: Help, gameFactory: GameFactory)
+    +Run(): void
+    +StartNewGame(): void
+    +LoadGame(): void
+    +SelectGameType(): string
+    +SelectGameMode(): string
+    +SelectBoardSize(gameType: string): int
+    +CreateGame(gameType: string, gameMode: string, boardSize: int): Game
+    -FindHumanMove(game: Game, boardNumber: int, rowNumber: int, columnNumber: int, value; string?): Move?
+    -ReadHumanMove(game: Game): Move?
+    -MakeCurrentPlayerMove(): void
+    +HandleCommand(command: string): void
+    +DisplayGame(): void
+    +DisplayResult(): void
+    -DisplayBoards(game: Game): void
 }
 
 %% connections
@@ -267,7 +285,12 @@ GameFactory ..> Board : creates
 GameFactory ..> Player : creates
 GameFactory ..> MoveStrategy : configures
 
+Help ..> Game : displays help for
+
 Program ..> GameController : starts
+Program ..> SaveManager : constructs
+Program ..> Help : constructs
+Program ..> GameFactory : constructs
 
 GameController "1" o-- "0..1" Game : current game
 
@@ -276,8 +299,8 @@ GameController --> ConsoleUI
 GameController --> GameFactory
 GameController --> SaveLoadService
 
-SaveLoadService --> GameSaveData : serialises
-SaveLoadService --> GameFactory : reconstructs through
+SaveManager --> GameFactory : reconstructs with
+SaveManager --> Game : saves and loads
 
 Move --> "1" Player : made by
 Move --> "1" Piece : places
