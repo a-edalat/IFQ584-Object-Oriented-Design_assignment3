@@ -251,7 +251,7 @@ public class GameController
 
         if (multiBoard)
         {
-            Console.WriteLine("Enter: board row column (or C to cancel"); 
+            Console.WriteLine("Enter: board row column (or C to cancel");
         }
         else if (needsNumber)
         {
@@ -299,6 +299,7 @@ public class GameController
             Console.WriteLine(
                 "Wrong number of values. See the prompt above. Separate your input with one space."
             );
+            return null;
         }
 
         int offset;
