@@ -36,9 +36,15 @@ public class GameController
             else
             {
                 DisplayGame();
-                Console.WriteLine("M - Make a move");
+                if (currentGame.IsGameOver)
+                    DisplayResult();
+                else
+                {
+                    Console.WriteLine("M - Make a move");
+                    Console.WriteLine("R - Redo");
+                }
+
                 Console.WriteLine("U - Undo");
-                Console.WriteLine("R - Redo");
                 Console.WriteLine("S - Save");
                 Console.WriteLine("N - Start a new game");
                 Console.WriteLine("L - Load a game");
@@ -263,7 +269,7 @@ public class GameController
 
         if (multiBoard)
         {
-            Console.WriteLine("Enter: board row column (or C to cancel");
+            Console.WriteLine("Enter: board row column (or C to cancel)");
         }
         else if (needsNumber)
         {
@@ -274,11 +280,11 @@ public class GameController
                 .OrderBy(value => value);
 
             Console.WriteLine($"{player.Name} - available numbers: {string.Join(", ", numbers)}");
-            Console.WriteLine("Enter: row column number (or C to cancel");
+            Console.WriteLine("Enter: row column number (or C to cancel)");
         }
         else
         {
-            Console.WriteLine("Enter: row column (or C to cancel");
+            Console.WriteLine("Enter: row column (or C to cancel)");
         }
 
         string? input = Console.ReadLine(); // user input here
@@ -489,11 +495,6 @@ public class GameController
         else
         {
             Console.WriteLine("That command is not recognised.");
-        }
-
-        if (currentGame.IsGameOver)
-        {
-            DisplayResult();
         }
     }
 
