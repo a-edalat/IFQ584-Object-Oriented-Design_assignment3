@@ -43,9 +43,37 @@
       "Row": 1,
       "Column": 0,
       "PieceValue": "X"
+    },
+    {
+      "PlayerId": 1,
+      "BoardIndex": 0,
+      "Row": 0,
+      "Column": 2,
+      "PieceValue": "X"
+    },
+    {
+      "PlayerId": 2,
+      "BoardIndex": 2,
+      "Row": 1,
+      "Column": 2,
+      "PieceValue": "X"
+    },
+    {
+      "PlayerId": 1,
+      "BoardIndex": 2,
+      "Row": 0,
+      "Column": 0,
+      "PieceValue": "X"
+    },
+    {
+      "PlayerId": 2,
+      "BoardIndex": 1,
+      "Row": 0,
+      "Column": 2,
+      "PieceValue": "X"
     }
   ],
-  "CurrentMoveIndex": 3,
+  "CurrentMoveIndex": 7,
   "CurrentPlayerId": 1,
   "Result": 0
 }

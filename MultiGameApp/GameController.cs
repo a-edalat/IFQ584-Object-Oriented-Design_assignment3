@@ -257,6 +257,13 @@ public class GameController
         }
         else if (needsNumber)
         {
+            var player = game.GetCurrentPlayer();
+            var numbers = player
+                .AvailablePieces.OfType<NumberPiece>()
+                .Select(number => number.Value)
+                .OrderBy(value => value);
+
+            Console.WriteLine($"{player.Name} - available numbers: {string.Join(", ", numbers)}");
             Console.WriteLine("Enter: row column number (or C to cancel");
         }
         else
@@ -392,7 +399,10 @@ public class GameController
 
         if (moveWasSuccessful)
         {
-            Console.WriteLine($"{player.Name} played {move.GetPiece().DisplayValue()}");
+            Console.WriteLine(
+                $"{player.Name} placed {move.GetPiece().DisplayValue()} at row {move.GetRow() + 1}, column {move.GetColumn() + 1}"
+                    + (currentGame is NotaktoGame ? $", board {move.GetBoardIndex() + 1}." : ".")
+            );
 
             if (
                 !player.IsComputer()
@@ -483,10 +493,6 @@ public class GameController
         DisplayBoards(currentGame);
 
         Console.WriteLine($"Current player: {currentGame.GetCurrentPlayer().Name}");
-
-        Console.WriteLine($"Result: {currentGame.Result}");
-
-        Console.WriteLine($"Valid moves available: " + $"{currentGame.GetValidMoves().Count}");
 
         Console.WriteLine();
     }
