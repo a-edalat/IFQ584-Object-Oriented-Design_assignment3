@@ -54,7 +54,6 @@ public class SaveManager
                 new
                 {
                     Id = player.Id,
-                    Name = player.Name,
                     IsComputer = player.IsComputer(),
                 }
             );
@@ -154,9 +153,6 @@ public class SaveManager
         {
             throw new InvalidDataException("The saved player information is invalid.");
         }
-
-        string playerOneName = ReadString(playerOne, "Name");
-        string playerTwoName = ReadString(playerTwo, "Name");
 
         Game game;
 
