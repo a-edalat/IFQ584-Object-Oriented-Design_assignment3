@@ -9,123 +9,113 @@ direction TB
 class notaktoGame["notaktoGame : NotaktoGame"] {
     Mode = HUMAN_VS_HUMAN
     Result = IN_PROGRESS
+    NotaktoGame._boards = [board0, board1, board2]
+    NotaktoGame._players = [player1, player2]
+    _moveHistory = history
     _currentPlayer = player1
-    InactiveBoards = [0]
+    _inactiveBoards = [0]
     _symbol = X
 }
 
 class board0["board0 : Board"] {
-    Rows = 3
-    Columns = 3
-    row0 = mark1 mark1 mark2
-    row1 = empty empty empty
-    row2 = empty empty empty
+    rows = 3
+    cols = 3
+    cells = [mark1, mark1, mark2, null, null, null, null, null, null]
 }
-note for board0 "Inactive after move4."
-%% TO ACTION
-note for board0 "Board Piece cell contract TBC - feedback raised."
+note for board0 "The top row contains X X X, so board 0 is inactive."
 
 class board1["board1 : Board"] {
-    Rows = 3
-    Columns = 3
-    row0 = empty empty empty
-    row1 = empty mark2 empty
-    row2 = empty empty empty
+    rows = 3
+    cols = 3
+    cells = [null, null, null, null, mark2, null, null, null, null]
 }
 
 class board2["board2 : Board"] {
-    Rows = 3
-    Columns = 3
-    row0 = empty empty empty
-    row1 = empty empty empty
-    row2 = empty empty empty
+    rows = 3
+    cols = 3
+    cells = [null, null, null, null, null, null, null, null, null]
 }
 
 class player1["player1 : HumanPlayer"] {
     Id = 1
     Name = Player 1
-    AvailablePieces = [mark1]
+    _availablePieces = [mark1]
 }
-
 class player2["player2 : HumanPlayer"] {
     Id = 2
     Name = Player 2
-    AvailablePieces = [mark2]
+    _availablePieces = [mark2]
 }
-
 class mark1["mark1 : MarkPiece"] {
-    Symbol = X
+    _symbol = X
 }
-
 class mark2["mark2 : MarkPiece"] {
-    Symbol = X
+    _symbol = X
 }
 
 class history["history : MoveHistory"] {
-    <<incomplete>>
-    _currentMoveIndex = 3
-    _moves = [move1, move2, move3, move4]
+    moves = [move1, move2, move3, move4]
+    currentMoveIndex = 3
 }
-
 class move1["move1 : Move"] {
-    <<incomplete>>
-    Player = player1
-    BoardIndex = 0
-    Row = 0
-    Column = 0
-    Piece = mark1
+    player = player1
+    boardIndex = 0
+    row = 0
+    column = 0
+    piece = mark1
 }
-
 class move2["move2 : Move"] {
-    <<incomplete>>
-    Player = player2
-    BoardIndex = 1
-    Row = 1
-    Column = 1
-    Piece = mark2
+    player = player2
+    boardIndex = 1
+    row = 1
+    column = 1
+    piece = mark2
 }
-
 class move3["move3 : Move"] {
-    <<incomplete>>
-    Player = player1
-    BoardIndex = 0
-    Row = 0
-    Column = 1
-    Piece = mark1
+    player = player1
+    boardIndex = 0
+    row = 0
+    column = 1
+    piece = mark1
 }
-
 class move4["move4 : Move"] {
-    <<incomplete>>
-    Player = player2
-    BoardIndex = 0
-    Row = 0
-    Column = 2
-    Piece = mark2
+    player = player2
+    boardIndex = 0
+    row = 0
+    column = 2
+    piece = mark2
 }
 
 %% connections
-%% composition
-notaktoGame *-- board0 : board 0
-notaktoGame *-- board1 : board 1
-notaktoGame *-- board2 : board 2
-notaktoGame *-- player1 : current player
-notaktoGame *-- player2 : player 2
-notaktoGame *-- history : move history
-
-history *-- move1 : first
-history *-- move2 : second
-history *-- move3 : third
-history *-- move4 : fourth
 
 %% aggregation
-player1 o-- mark1 : owns reusable mark
-player2 o-- mark2 : owns reusable mark
-board0 o-- mark1 : cells 0,0 and 0,1
-board0 o-- mark2 : cell 0,2
-board1 o-- mark2 : cell 1,1
+notaktoGame o-- board0 : board 0
+notaktoGame o-- board1 : board 1
+notaktoGame o-- board2 : board 2
+notaktoGame o-- player1 : current player
+notaktoGame o-- player2 : player 2
+notaktoGame *-- history : history
+
+
+player1 o-- mark1 : reusable mark
+player2 o-- mark2 : reusable mark
+
+board0 o-- mark1 : cells 0 and 1
+
+board0 o-- mark2 : cell 2
+board1 o-- mark2 : cell 4
+
+history o-- move1 : first
+history o-- move2 : second
+history o-- move3 : third
+history o-- move4 : fourth
 
 %% association
-move1 --> board0 : targets
-move2 --> board1 : targets
-move3 --> board0 : targets
-move4 --> board0 : targets
+move1 --> player1 : player
+move1 --> mark1 : piece
+move2 --> player2 : player
+move2 --> mark2 : piece
+move3 --> player1 : player
+move3 --> mark1 : piece
+move4 --> player2 : player
+move4 --> mark2 : piece
