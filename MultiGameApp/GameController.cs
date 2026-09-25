@@ -7,6 +7,7 @@ public class GameController
     private readonly SaveManager saveManager;
     private readonly Help help;
     private readonly GameFactory gameFactory;
+
     // private readonly string saveFilePath;
 
     // constructor
@@ -69,7 +70,6 @@ public class GameController
             {
                 return;
             }
-
         }
     }
 
@@ -79,10 +79,7 @@ public class GameController
         string gameMode = SelectGameMode();
         int boardSize = SelectBoardSize(gameType);
 
-        currentGame = CreateGame(
-            gameType,
-            gameMode,
-            boardSize);
+        currentGame = CreateGame(gameType, gameMode, boardSize);
 
         Console.WriteLine("A new game has been created.");
     }
@@ -168,19 +165,16 @@ public class GameController
 
         while (true)
         {
-            Console.WriteLine(
-                "Enter the board size. It must be at least 3:");
+            Console.WriteLine("Enter the board size. It must be at least 3:");
 
             string input = Console.ReadLine() ?? string.Empty;
 
-            if (int.TryParse(input, out int boardSize)
-                && boardSize >= 3)
+            if (int.TryParse(input, out int boardSize) && boardSize >= 3)
             {
                 return boardSize;
             }
 
-            Console.WriteLine(
-                "Please enter a whole number of at least 3.");
+            Console.WriteLine("Please enter a whole number of at least 3.");
         }
     }
 
@@ -191,8 +185,7 @@ public class GameController
 
         if (gameType == "NumericalTicTacToe")
         {
-            selectedGameType =
-                GameType.NUMERICAL_TIC_TAC_TOE;
+            selectedGameType = GameType.NUMERICAL_TIC_TAC_TOE;
         }
         else if (gameType == "Notakto")
         {
@@ -204,9 +197,7 @@ public class GameController
         }
         else
         {
-            throw new ArgumentException(
-                "The game type is not recognised.",
-                nameof(gameType));
+            throw new ArgumentException("The game type is not recognised.", nameof(gameType));
         }
 
         if (gameMode == "HumanVsHuman")
@@ -219,18 +210,19 @@ public class GameController
         }
         else
         {
-            throw new ArgumentException(
-                "The game mode is not recognised.",
-                nameof(gameMode));
+            throw new ArgumentException("The game mode is not recognised.", nameof(gameMode));
         }
 
-        return gameFactory.CreateGame(
-            selectedGameType,
-            selectedGameMode,
-            boardSize);
+        return gameFactory.CreateGame(selectedGameType, selectedGameMode, boardSize);
     }
 
-    private static Move? FindHumanMove(Game game, int boardNumber, int rowNumber, int columnNumber, string? value)
+    private static Move? FindHumanMove(
+        Game game,
+        int boardNumber,
+        int rowNumber,
+        int columnNumber,
+        string? value
+    )
     {
         int boardIndex = boardNumber - 1;
         int rowIndex = rowNumber - 1;
@@ -299,7 +291,9 @@ public class GameController
 
         if (parts.Length != expected)
         {
-            Console.WriteLine("Wrong number of values. See the prompt above. Separate your input with one space.");
+            Console.WriteLine(
+                "Wrong number of values. See the prompt above. Separate your input with one space."
+            );
         }
 
         int offset;
@@ -391,13 +385,23 @@ public class GameController
             move = ReadHumanMove(currentGame); //null means invalid move
         }
 
-        if (move is null) return;
+        if (move is null)
+            return;
 
         bool moveWasSuccessful = currentGame.MakeMove(move);
 
         if (moveWasSuccessful)
         {
             Console.WriteLine($"{player.Name} played {move.GetPiece().DisplayValue()}");
+
+            if (
+                !player.IsComputer()
+                && !currentGame.IsGameOver
+                && currentGame.GetCurrentPlayer() is ComputerPlayer
+            )
+            {
+                MakeCurrentPlayerMove();
+            }
         }
         else
         {
@@ -439,16 +443,14 @@ public class GameController
         {
             if (currentGame.UndoMove() == false)
             {
-                Console.WriteLine(
-                    "There are no moves available to undo.");
+                Console.WriteLine("There are no moves available to undo.");
             }
         }
         else if (command == "R")
         {
             if (currentGame.RedoMove() == false)
             {
-                Console.WriteLine(
-                    "There are no moves available to redo.");
+                Console.WriteLine("There are no moves available to redo.");
             }
         }
         else if (command == "S")
@@ -476,8 +478,7 @@ public class GameController
         }
 
         Console.WriteLine();
-        Console.WriteLine(
-            $"Game: {currentGame.GetType().Name}");
+        Console.WriteLine($"Game: {currentGame.GetType().Name}");
 
         DisplayBoards(currentGame);
 
@@ -496,8 +497,7 @@ public class GameController
         {
             return;
         }
-        Console.WriteLine(
-            $"Game result: {currentGame.Result}");
+        Console.WriteLine($"Game result: {currentGame.Result}");
     }
 
     private static void DisplayBoards(Game game)
@@ -506,7 +506,10 @@ public class GameController
         {
             Board board = game.Boards[boardIndex];
             (int Rows, int Columns) dimensions = board.GetDimensions();
-            int cellWidth = Math.Max(3, (dimensions.Rows * dimensions.Columns).ToString().Length + 1);
+            int cellWidth = Math.Max(
+                3,
+                (dimensions.Rows * dimensions.Columns).ToString().Length + 1
+            );
 
             if (game is NotaktoGame notakto && notakto.InactiveBoards.Contains(boardIndex))
             {
