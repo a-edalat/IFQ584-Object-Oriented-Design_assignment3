@@ -3,6 +3,7 @@ sequenceDiagram
 %% config
 autonumber
 actor user as User
+participant movingPlayer as movingPlayer : Player
 participant controller as controller : GameController
 participant saveManager as saveManager : SaveManager
 participant factory as factory : GameFactory
@@ -22,13 +23,15 @@ factory-->>saveManager: loadedGame
 
 %% restore saved history
 loop Four saved moves in order
-    saveManager->>saveManager: FindReplayMove(loadedgame, savedMove)
-    Note over saveManager,game: The matched move uses a player's owned MarkPiece.
-    saveManager->>game: MakeMove(move)
-    game->>board: PlaceMove(move)
-    game->>history: AddMove(move)
-    game->>game: EvaluateResult()
-end
+      saveManager->>saveManager: FindReplayMove(loadedGame, savedMove)
+      Note over game,movingPlayer: movingPlayer is move.GetPlayer() for this move.
+      saveManager->>game: MakeMove(move)
+      game->>board: PlaceMove(move)
+      game->>movingPlayer: UsePiece(move.GetPiece())
+      game->>history: AddMove(move)
+      game->>game: EvaluateResult()
+      game->>game: SwitchPlayer()
+  end
 Note over game,history: After replay, cursor is 3, human is next, result is IN_PROGRESS.
 saveManager->>controller: loadedGame
 
@@ -38,6 +41,7 @@ controller->>game: UndoMove()
 game->>board: RemoveMove(move4)
 game->>computer: RestorePiece(move4.GetPiece())
 game->>history: UndoLastMove()
+Note over game: _currentPlayer = computer
 game->>game: EvaluateResult()
 game-->>controller: true
 Note over game,history: Cursor is 2, computer next, Result is IN_PROGRESS, move4 remains available for redo.
