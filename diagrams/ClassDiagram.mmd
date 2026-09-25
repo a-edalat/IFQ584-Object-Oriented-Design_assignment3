@@ -107,8 +107,8 @@ class Board {
     +PlaceMove(move: Move): void
     +RemoveMove(move: Move): void
     +IsFull(): bool
-    -SetCell(row: int, column: int, piece: Piece?): void
-    +GetCell(row: int, column: int): Piece?
+    -SetCell(row: int, col: int, piece: Piece?): void
+    +GetCell(row: int, col: int): Piece?
     +GetDimensions(): (int Rows, int Columns)
 }
 
