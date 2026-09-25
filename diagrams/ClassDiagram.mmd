@@ -85,8 +85,8 @@ class Move {
 }
 
 class MoveHistory {
-    -_moves: List~Move~
-    -_currentMoveIndex: int
+    -moves: List~Move~
+    -currentMoveIndex: int
     +MoveHistory(moves: List~Move~, currentMoveIndex: int)
     +ClearRedoHistory(): void
     +AddMove(Move move): void
@@ -98,7 +98,7 @@ class MoveHistory {
 
 class Board {
     -rows: int
-    -columns: int
+    -cols: int
     -cells: Piece?[]
     +Board(rows: int, cols: int)
     +IsWithinBoard(row: int, col: int): bool
@@ -125,7 +125,7 @@ class Game {
     +Players: IReadOnlyList~Player~
     +Moves: IReadOnlyList~Move~
     +CurrentMoveIndex: int
-    +Game(players: List~players~, boards: List~Board~, mode: GameMode)
+    +Game(players: List~Player~, boards: List~Board~, mode: GameMode)
     #IsValidMove(move: Move): bool
     +MakeMove(move: Move): bool
     +UndoMove(): bool
@@ -170,6 +170,7 @@ class NotaktoGame {
     -_inactiveBoards: List~int~
     -_symbol: string
     +InactiveBoards: IReadOnlyList~int~
+    +NotaktoGame(players: List~Player~, boards: List~Board~, mode: GameMode)
     -ValidatePlayers(players: List~Player~): List~Player~
     -ValidateBoards(boards: List~Board~): List~Board~
     -GetPlayerMark(player: Player): MarkPiece
@@ -221,9 +222,9 @@ class SaveManager {
     +LoadGame(): Game
     +FileExists(): bool
     -FindReplayMove(game: Game, savedMove: JsonElement): Move?
-    -ReadInt(item: JsonElementl, propertyName: string): int
+    -ReadInt(item: JsonElement, propertyName: string): int
     -ReadBool(item: JsonElement, propertyName: string): bool
-    -ReadString(item: Jsonelement, propertyName: string): string
+    -ReadString(item: JsonElement, propertyName: string): string
 }
 
 class Help {
@@ -243,7 +244,7 @@ class GameController {
     +SelectGameMode(): string
     +SelectBoardSize(gameType: string): int
     +CreateGame(gameType: string, gameMode: string, boardSize: int): Game
-    -FindHumanMove(game: Game, boardNumber: int, rowNumber: int, columnNumber: int, value; string?): Move?
+    -FindHumanMove(game: Game, boardNumber: int, rowNumber: int, columnNumber: int, value: string?): Move?
     -ReadHumanMove(game: Game): Move?
     -MakeCurrentPlayerMove(): void
     +HandleCommand(command: string): void
@@ -267,13 +268,15 @@ Game <|-- NotaktoGame
 Game <|-- GomokuGame
 
 %% aggegation and composition
-Player "1" o-- "1..*" Piece : owns
+Player "1" o-- "0..*" Piece : owns
 
 ComputerPlayer "1" *-- "1" MoveStrategy : uses
 
 Game "1" *-- "1..3" Board : owns
 Game "1" *-- "2" Player : participants
 Game "1" *-- "1" MoveHistory : history
+
+GameController "1" --> "1" Help : displays guidance
 
 Board "1" o-- "0..*" Piece : cell contents
 
@@ -295,9 +298,8 @@ Program ..> GameFactory : constructs
 GameController "1" o-- "0..1" Game : current game
 
 %% directed association
-GameController --> ConsoleUI
 GameController --> GameFactory
-GameController --> SaveLoadService
+GameController --> SaveManager
 
 SaveManager --> GameFactory : reconstructs with
 SaveManager --> Game : saves and loads

@@ -18,7 +18,7 @@ strategy->>game: GetValidMoves()
 
 loop Cell candidates until an immediate win is found
     strategy->>game: WouldMoveWin(candidate)
-    game->>game: HasWinningLine(row, column, 0)
+    game->>game: HasWinningLine(row, column, symbol)
     game-->>strategy: true or false
 end
 strategy-->>computer: winningMove
