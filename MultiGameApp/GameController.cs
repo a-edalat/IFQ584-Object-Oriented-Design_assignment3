@@ -325,11 +325,13 @@ public class GameController
         if (!int.TryParse(parts[offset], out row))
         {
             Console.WriteLine("Use whole numbers for positions and values.");
+            return null;
         }
 
         if (!int.TryParse(parts[offset + 1], out column))
         {
             Console.WriteLine("Use whole numbers for positions and values.");
+            return null;
         }
 
         if (needsNumber && !int.TryParse(parts[2], out _))
@@ -420,6 +422,7 @@ public class GameController
         if (command == "H")
         {
             help.Display(currentGame);
+            return;
         }
 
         if (currentGame == null)
@@ -476,15 +479,13 @@ public class GameController
         Console.WriteLine(
             $"Game: {currentGame.GetType().Name}");
 
-        Console.WriteLine(
-            $"Current player: {currentGame.GetCurrentPlayer().Name}");
+        DisplayBoards(currentGame);
 
-        Console.WriteLine(
-            $"Result: {currentGame.Result}");
+        Console.WriteLine($"Current player: {currentGame.GetCurrentPlayer().Name}");
 
-        Console.WriteLine(
-            $"Valid moves available: "
-            + $"{currentGame.GetValidMoves().Count}");
+        Console.WriteLine($"Result: {currentGame.Result}");
+
+        Console.WriteLine($"Valid moves available: " + $"{currentGame.GetValidMoves().Count}");
 
         Console.WriteLine();
     }
