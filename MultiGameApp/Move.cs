@@ -7,23 +7,31 @@ public class Move
     private readonly int boardIndex;
     private readonly int row;
     private readonly int column;
-    private readonly int value;
+    private readonly Piece piece;
 
     // constructor
-    public Move(Player player, int boardIndex, int row, int column, int value)
+    public Move(Player player, int boardIndex, int row, int column, Piece piece)
     {
         if (player == null)
         {
             throw new ArgumentNullException(nameof(player));
         }
+
+        if (piece == null)
+        {
+            throw new ArgumentNullException(nameof(piece));
+        }
+
         if (boardIndex < 0)
         {
             throw new ArgumentOutOfRangeException(nameof(boardIndex));
         }
+
         if (row < 0)
         {
             throw new ArgumentOutOfRangeException(nameof(row));
         }
+
         if (column < 0)
         {
             throw new ArgumentOutOfRangeException(nameof(column));
@@ -33,11 +41,10 @@ public class Move
         this.boardIndex = boardIndex;
         this.row = row;
         this.column = column;
-        this.value = value;
+        this.piece = piece;
     }
 
     // Methods
-
     public Player GetPlayer()
     {
         return player;
@@ -54,11 +61,9 @@ public class Move
     {
         return column;
     }
-    public int GetValue()
+    public Piece GetPiece()
     {
-        return value;
+        return piece;
     }
-
-
 
 } // closes Move class

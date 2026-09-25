@@ -122,11 +122,11 @@ public class NumericalTTTGame : Game
 
     protected override bool IsValidMove(Move move)
     {
-        if (!base.IsValidMove(move) || move.BoardIndex != 0)
+        if (!base.IsValidMove(move) || move.GetBoardIndex() != 0)
             return false;
 
         var player = GetCurrentPlayer();
-        if (!ReferenceEquals(move.GetPlayer(), player) || move.Piece is not NumberPiece number)
+        if (!ReferenceEquals(move.GetPlayer(), player) || move.GetPiece() is not NumberPiece number)
             return false;
 
         return PlayerOwnsNumber(player, number.Value) && IsNumberUnused(number.Value);

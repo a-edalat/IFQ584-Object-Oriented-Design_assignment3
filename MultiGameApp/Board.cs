@@ -15,12 +15,12 @@ public class Board
         // I assume the boards should not be smaller than 3 x 3
         if (rows < 3)
         {
-            throw new ArgumentException(nameof(rows));
+            throw new ArgumentOutOfRangeException(nameof(rows), "A board needs at least three rows.");
         }
 
         if (cols < 3)
         {
-            throw new ArgumentException(nameof(cols));
+            throw new ArgumentOutOfRangeException(nameof(cols), "A board needs at least three columns.");
         }
 
         this.rows = rows;
@@ -33,15 +33,7 @@ public class Board
     // used for Numerical TTT as it has variable board size.
     public bool IsWithinBoard(int row, int col)
     {
-        if (row >= rows || row < 0)
-        {
-            return false;
-        }
-        if (col >= cols || col < 0)
-        {
-            return false;
-        }
-        return true;
+        return (row < rows && row >= 0 && col >= 0 && col < cols);
     }
 
     // used for Gomoku, Notakto as they have fixed board size.
@@ -52,53 +44,48 @@ public class Board
 
     public bool IsCellEmpty(int row, int col)
     {
-        if (IsWithinBoard(row, col) == false)
-        {
-            throw new ArgumentOutOfRangeException();
-        }
         return GetCell(row, col) is null;
     }
 
     public void PlaceMove(Move move)
     {
         ArgumentNullException.ThrowIfNull(move);
-        ArgumentNullException.ThrowIfNull(move.Piece); //Making sure move is not null
 
         // first extracting row, column and value
         int row = move.GetRow();
         int col = move.GetColumn();
-        Piece val = move.GetValue();
 
-        if (IsWithinBoard(row, col) == false)
+        if (!IsWithinBoard(row, col))
         {
-            throw new ArgumentOutOfRangeException();
+            throw new ArgumentOutOfRangeException(nameof(move), "The move is outside the board.");
         }
-        if (IsCellEmpty(row, col) == false)
+
+        if (!IsCellEmpty(row, col))
         {
-            throw new InvalidOperationException();
+            throw new InvalidOperationException("The cell is already occupied.");
         }
 
         // int index = row * cols + col;
         // cells[index] = val;
-        SetCell(row, col, val);
+        SetCell(row, col, move.GetPiece());
     }
 
     public void RemoveMove(Move move)
     {
         ArgumentNullException.ThrowIfNull(move);
-        ArgumentNullException.ThrowIfNull(move.Piece); //Making sure move is not null
 
-        // first extracting row, column and value
         int row = move.GetRow();
         int col = move.GetColumn();
 
-        if (IsWithinBoard(row, col) == false)
+        if (!IsWithinBoard(row, col))
         {
-            throw new ArgumentOutOfRangeException();
+            throw new ArgumentOutOfRangeException(nameof(move), "The move is outside the board.");
         }
-        if (IsCellEmpty(row, col) == true)
+
+        // Undo must not erase a different piece if board and history disagree.
+        if (!ReferenceEquals(GetCell(row, col), move.GetPiece()))
         {
-            throw new InvalidOperationException();
+            throw new InvalidOperationException("The cell does not contain this move's piece.");
         }
 
         SetCell(row, col, null);
@@ -118,8 +105,13 @@ public class Board
     {
         if (!IsWithinBoard(row, col))
         {
-            throw new ArgumentOutOfRangeException();
+            throw new ArgumentOutOfRangeException("The position is outside the board.");
         }
         return cells[row * cols + col];
+    }
+
+    public (int Rows, int Columns) GetDimensions() // adding this method to make game display easier, this needs to be added to CRC and class diagram
+    {
+        return (rows, cols);
     }
 } // closes Board class

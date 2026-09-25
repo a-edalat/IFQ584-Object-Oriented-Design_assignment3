@@ -91,23 +91,23 @@ public class GomokuGame : Game
 
     protected override bool IsValidMove(Move move)
     {
-        if (!base.IsValidMove(move) || move.BoardIndex != 0)
+        if (!base.IsValidMove(move) || move.GetBoardIndex() != 0)
             return false;
 
         var player = GetCurrentPlayer();
         if (!ReferenceEquals(move.GetPlayer(), player))
             return false;
 
-        return move.Piece is MarkPiece mark && mark.Symbol == GetPlayerMark(player).Symbol;
+        return move.GetPiece() is MarkPiece mark && mark.Symbol == GetPlayerMark(player).Symbol;
     }
 
     // win state
     public override bool WouldMoveWin(Move move)
     {
-        if (!IsValidMove(move) || move.Piece is not MarkPiece mark)
+        if (!IsValidMove(move) || move.GetPiece() is not MarkPiece mark)
             return false;
 
-        return HasWinningLine(move.Row, move.Column, mark.Symbol);
+        return HasWinningLine(move.GetRow(), move.GetColumn(), mark.Symbol);
     }
 
     private bool HasWinningLine(int row, int column, string symbol)

@@ -15,47 +15,43 @@ public abstract class Game
     // constructor
     public Game(List<Player> players, List<Board> boards, GameMode mode)
     {
-        // currentPlayer initialisation
-        // checking validity of the players before selecting initial player
-        // I decided not to check the number of players here to allow future extenstion to the game,
-        // if a future game has more then 2 players, or it is a signle player game, then this class is
-        // configurable enough, each game class can check if number of players matches its requirement
-        if (players == null)
-        {
-            throw new ArgumentNullException(nameof(players));
-        }
+        ArgumentNullException.ThrowIfNull(players);
+        ArgumentNullException.ThrowIfNull(boards);
+
         if (players.Count == 0)
         {
-            throw new ArgumentException(
-                "You currently have zero players, at least one player is required.",
-                nameof(players)
-            );
+            throw new ArgumentException("At least one valid player is required.", nameof(players));
         }
 
-        // boards initialisation
-        // check if each game has at least a board and the boards is not null
-        // Each game then can check if the number of boards matches their requirement
-        if (boards == null)
-        {
-            throw new ArgumentNullException(nameof(boards));
-        }
         if (boards.Count == 0)
         {
-            throw new ArgumentException(
-                "You currently have zero boards, at least one board is required.",
-                nameof(boards)
-            );
+            throw new ArgumentException("At least one valid board is required.", nameof(boards));
         }
 
-        // gameMode
-        if (Enum.IsDefined(typeof(GameMode), mode) == false)
+        foreach (Player player in players)
         {
-            throw new ArgumentOutOfRangeException(nameof(mode), "The game mode is not valid.");
+            if (player is null)
+            {
+                throw new ArgumentException("A player cannot be null.", nameof(players));
+            }
+        }
+
+        foreach (Board board in boards)
+        {
+            if (board is null)
+            {
+                throw new ArgumentException("A board cannot be null.", nameof(boards));
+            }
+        }
+
+        if (!Enum.IsDefined(mode))
+        {
+            throw new ArgumentOutOfRangeException(nameof(mode));
         }
 
         _players = players;
         _boards = boards;
-        _moveHistory = new MoveHistory();
+        _moveHistory = new MoveHistory(new List<Move>(), -1);
         _currentPlayer = players[0];
 
         Mode = mode;
@@ -64,12 +60,32 @@ public abstract class Game
 
     // getters
     public GameMode Mode { get; }
-
     public GameResult Result { get; protected set; }
 
     public bool IsGameOver
     {
         get { return Result != GameResult.IN_PROGRESS; }
+    }
+
+    // A caller can inspect these lists but cannot add or remove items through them.
+    public IReadOnlyList<Board> Boards
+    {
+        get { return _boards.AsReadOnly(); }
+    }
+
+    public IReadOnlyList<Player> Players
+    {
+        get { return _players.AsReadOnly(); }
+    }
+
+    public IReadOnlyList<Move> Moves
+    {
+        get { return _moveHistory.GetMoves(); }
+    }
+
+    public int CurrentMoveIndex
+    {
+        get { return _moveHistory.GetCurrentIndex(); }
     }
 
     // Methods
@@ -83,56 +99,61 @@ public abstract class Game
     // with protected, derived classes can also use this
     protected virtual bool IsValidMove(Move move)
     {
-        ArgumentNullException.ThrowIfNull(move); //Making sure move is not null
+        ArgumentNullException.ThrowIfNull(move);
 
-        // assuming move has board #, row, col and value in that order
+        if (!ReferenceEquals(move.GetPlayer(), _currentPlayer))
+        {
+            return false;
+        }
 
-        int row = move.Row;
-        int col = move.Column;
-        int boardIndex = move.BoardIndex;
+        if (!_currentPlayer.HasPiece(move.GetPiece()))
+        {
+            return false;
+        }
+
+        int boardIndex = move.GetBoardIndex();
 
         if (boardIndex < 0 || boardIndex >= _boards.Count)
         {
             return false;
         }
-        // currently using .Rows and .Columns, but during implementation I may
-        // Change this to size. so an i and j values essentially.
-        // Now that I know boardindex is valid, I can read the board
-        Board selectedBoard = _boards[boardIndex];
 
-        // if (row < 0 || row >= selectedBoard.Rows)
-        if (selectedBoard.IsWithinBoard(row, col) == false)
+        Board selectedBoard = _boards[boardIndex];
+        int row = move.GetRow();
+        int column = move.GetColumn();
+
+        if (!selectedBoard.IsWithinBoard(row, column))
         {
             return false;
         }
-        if (selectedBoard.IsCellEmpty(row, col) == false)
-        {
-            return false;
-        }
-        return true; // returning true after validation checks above
+
+        return selectedBoard.IsCellEmpty(row, column);
     }
+
 
     // adding tmp makemove - can be removed later, boilerplate for me to use when testing game subclasses
     public bool MakeMove(Move move)
     {
-        if (IsGameOver)
-        {
-            return false;
-        }
 
-        if (IsValidMove(move) == false)
+        ArgumentNullException.ThrowIfNull(move);
+
+        if (IsGameOver || !IsValidMove(move))
         {
             return false;
         }
 
         Player player = move.GetPlayer();
+        Board selectedBoard = _boards[move.GetBoardIndex()];
 
-        if (!player.UsePiece(move.Piece))
+        // Place first so a board error cannot consume the player's piece.
+        selectedBoard.PlaceMove(move);
+
+        if (!player.UsePiece(move.GetPiece()))
         {
+            selectedBoard.RemoveMove(move);
             return false;
         }
 
-        ApplyMove(move);
         _moveHistory.AddMove(move);
         Result = EvaluateResult();
 
@@ -144,12 +165,12 @@ public abstract class Game
         return true;
     }
 
-    public void ApplyMove(Move move)
-    {
-        Board selectedBoard = _boards[move.BoardIndex];
+    // public void ApplyMove(Move move)
+    // {
+    //     Board selectedBoard = _boards[move.GetBoardIndex()];
 
-        selectedBoard.PlaceMove(move);
-    }
+    //     selectedBoard.PlaceMove(move);
+    // }
 
     public bool UndoMove()
     {
@@ -158,12 +179,14 @@ public abstract class Game
             return false;
         }
 
-        Move moveToUndo = _moveHistory.UndoLastMove();
-        Board selectedBoard = _boards[moveToUndo.BoardIndex];
+        // Inspect before changing the history index. If removal fails, history stays put.
+        Move moveToUndo = _moveHistory.GetMoves()[_moveHistory.GetCurrentIndex()];
+        Board selectedBoard = _boards[moveToUndo.GetBoardIndex()];
         Player player = moveToUndo.GetPlayer();
 
         selectedBoard.RemoveMove(moveToUndo);
-        player.RestorePiece(moveToUndo.Piece);
+        player.RestorePiece(moveToUndo.GetPiece());
+        _moveHistory.UndoLastMove();
 
         _currentPlayer = player;
         Result = EvaluateResult();
@@ -173,22 +196,33 @@ public abstract class Game
 
     public bool RedoMove()
     {
-        if (_moveHistory.GetCurrentIndex() >= _moveHistory.GetMoves().Count - 1)
+        int nextMoveIndex = _moveHistory.GetCurrentIndex() + 1;
+        List<Move> moves = _moveHistory.GetMoves();
+
+        if (nextMoveIndex >= moves.Count)
         {
             return false;
         }
 
-        Move moveToRedo = _moveHistory.RedoLastMove();
-        Board selectedBoard = _boards[moveToRedo.BoardIndex];
-        Player player = moveToRedo.GetPlayer();
+        Move moveToRedo = moves[nextMoveIndex];
 
-        if (!player.UsePiece(moveToRedo.Piece))
+        if (!IsValidMove(moveToRedo))
         {
-            throw new InvalidOperationException("The piece required for redo is not available.");
+            throw new InvalidOperationException("The saved move is no longer valid for redo.");
         }
 
+        Board selectedBoard = _boards[moveToRedo.GetBoardIndex()];
+        Player player = moveToRedo.GetPlayer();
         selectedBoard.PlaceMove(moveToRedo);
-        _currentPlayer = moveToRedo.GetPlayer();
+
+        if (!player.UsePiece(moveToRedo.GetPiece()))
+        {
+            selectedBoard.RemoveMove(moveToRedo);
+            throw new InvalidOperationException("The piece required for redo is unavailable.");
+        }
+
+        _moveHistory.RedoLastMove();
+        _currentPlayer = player;
         Result = EvaluateResult();
 
         if (Result == GameResult.IN_PROGRESS)
@@ -229,17 +263,18 @@ public abstract class Game
     public abstract GameResult EvaluateResult();
     public abstract string GetHelpText();
 
-    public void TakeTurn()
-    {
-        Move proposedMove = _currentPlayer.GetMove();
-        MakeMove(proposedMove);
-    }
+// commenting these two out and replace thme with a function in GameController
+    // public void TakeTurn()
+    // {
+    //     Move proposedMove = _currentPlayer.GetMove();
+    //     MakeMove(proposedMove);
+    // }
 
-    public void StartGame()
-    {
-        while (Result == GameResult.IN_PROGRESS)
-        {
-            TakeTurn();
-        }
-    }
+    // public void StartGame()
+    // {
+    //     while (Result == GameResult.IN_PROGRESS)
+    //     {
+    //         TakeTurn();
+    //     }
+    // }
 } // closes Game class

@@ -93,7 +93,7 @@ public class NotaktoGame : Game
 
     protected override bool IsValidMove(Move move)
     {
-        if (!base.IsValidMove(move) || CheckBoardHasLine(_boards[move.BoardIndex]))
+        if (!base.IsValidMove(move) || CheckBoardHasLine(_boards[move.GetBoardIndex()]))
             return false;
 
         var player = GetCurrentPlayer();
@@ -101,8 +101,8 @@ public class NotaktoGame : Game
         if (!ReferenceEquals(move.GetPlayer(), player))
             return false;
 
-        return ReferenceEquals(move.Piece, GetPlayerMark(player))
-            && move.Piece is MarkPiece mark
+        return ReferenceEquals(move.GetPiece(), GetPlayerMark(player))
+            && move.GetPiece() is MarkPiece mark
             && mark.Symbol == _symbol;
     }
 
