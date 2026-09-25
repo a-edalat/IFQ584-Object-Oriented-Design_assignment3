@@ -476,8 +476,15 @@ public class GameController
         }
         else if (command == "S")
         {
-            saveManager.SaveGame(currentGame);
-            Console.WriteLine("The game was saved.");
+            try
+            {
+                saveManager.SaveGame(currentGame);
+                Console.WriteLine("The game was saved.");
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"Save failed({e.GetType().Name}): {e.Message}");
+            }
         }
         else
         {
