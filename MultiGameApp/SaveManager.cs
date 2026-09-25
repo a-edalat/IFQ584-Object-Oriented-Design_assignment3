@@ -1,11 +1,6 @@
 using System.Text.Json;
-// test
-namespace MultiGameApp;
 
-// this class needs a careful review at the end to make sure it stores information sufficiently, currently it may not save all the necessary details yet
-// I have not worked with JSON serializer yet, and it is difficult to imagine the outcome
-//
-// also check your SaveGame and LoadGame pathes to make sure they refer to the same path everytime, when you are testing above.
+namespace MultiGameApp;
 
 public class SaveManager
 {
@@ -55,26 +50,30 @@ public class SaveManager
 
         foreach (Player player in game.Players)
         {
-            savedPlayers.Add(new
-            {
-                Id = player.Id,
-                Name = player.Name,
-                IsComputer = player.IsComputer()
-            });
+            savedPlayers.Add(
+                new
+                {
+                    Id = player.Id,
+                    Name = player.Name,
+                    IsComputer = player.IsComputer(),
+                }
+            );
         }
 
         List<object> savedMoves = new List<object>();
 
         foreach (Move move in game.Moves)
         {
-            savedMoves.Add(new
-            {
-                PlayerId = move.GetPlayer().Id,
-                BoardIndex = move.GetBoardIndex(),
-                Row = move.GetRow(),
-                Column = move.GetColumn(),
-                PieceValue = move.GetPiece().DisplayValue()
-            });
+            savedMoves.Add(
+                new
+                {
+                    PlayerId = move.GetPlayer().Id,
+                    BoardIndex = move.GetBoardIndex(),
+                    Row = move.GetRow(),
+                    Column = move.GetColumn(),
+                    PieceValue = move.GetPiece().DisplayValue(),
+                }
+            );
         }
 
         var savedGame = new
@@ -87,7 +86,7 @@ public class SaveManager
             Moves = savedMoves,
             CurrentMoveIndex = game.CurrentMoveIndex,
             CurrentPlayerId = game.GetCurrentPlayer().Id,
-            Result = game.Result
+            Result = game.Result,
         };
 
         JsonSerializerOptions options = new JsonSerializerOptions();
@@ -117,18 +116,26 @@ public class SaveManager
 
         if (!Enum.IsDefined(gameType) || !Enum.IsDefined(mode) || !Enum.IsDefined(savedResult))
         {
-            throw new InvalidDataException("The save contains an invalid game type, mode, or result.");
+            throw new InvalidDataException(
+                "The save contains an invalid game type, mode, or result."
+            );
         }
 
-        if (!savedGame.TryGetProperty("Players", out JsonElement savedPlayers) ||
-            savedPlayers.ValueKind != JsonValueKind.Array || savedPlayers.GetArrayLength() != 2)
+        if (
+            !savedGame.TryGetProperty("Players", out JsonElement savedPlayers)
+            || savedPlayers.ValueKind != JsonValueKind.Array
+            || savedPlayers.GetArrayLength() != 2
+        )
         {
             throw new InvalidDataException("The save must contain two players.");
         }
 
-        if (!savedGame.TryGetProperty("Moves", out JsonElement savedMoves) ||
-            savedMoves.ValueKind != JsonValueKind.Array ||
-            savedMoveIndex < -1 || savedMoveIndex >= savedMoves.GetArrayLength())
+        if (
+            !savedGame.TryGetProperty("Moves", out JsonElement savedMoves)
+            || savedMoves.ValueKind != JsonValueKind.Array
+            || savedMoveIndex < -1
+            || savedMoveIndex >= savedMoves.GetArrayLength()
+        )
         {
             throw new InvalidDataException("The saved move history is invalid.");
         }
@@ -136,12 +143,14 @@ public class SaveManager
         JsonElement playerOne = savedPlayers[0];
         JsonElement playerTwo = savedPlayers[1];
 
-        if (playerOne.ValueKind != JsonValueKind.Object ||
-            playerTwo.ValueKind != JsonValueKind.Object ||
-            ReadInt(playerOne, "Id") != 1 ||
-            ReadInt(playerTwo, "Id") != 2 ||
-            ReadBool(playerOne, "IsComputer") ||
-            ReadBool(playerTwo, "IsComputer") != (mode == GameMode.HUMAN_VS_COMPUTER))
+        if (
+            playerOne.ValueKind != JsonValueKind.Object
+            || playerTwo.ValueKind != JsonValueKind.Object
+            || ReadInt(playerOne, "Id") != 1
+            || ReadInt(playerTwo, "Id") != 2
+            || ReadBool(playerOne, "IsComputer")
+            || ReadBool(playerTwo, "IsComputer") != (mode == GameMode.HUMAN_VS_COMPUTER)
+        )
         {
             throw new InvalidDataException("The saved player information is invalid.");
         }
@@ -206,11 +215,13 @@ public class SaveManager
 
         foreach (Move move in game.GetValidMoves())
         {
-            if (move.GetPlayer().Id == playerId &&
-                move.GetBoardIndex() == boardIndex &&
-                move.GetRow() == row &&
-                move.GetColumn() == column &&
-                move.GetPiece().DisplayValue() == pieceValue)
+            if (
+                move.GetPlayer().Id == playerId
+                && move.GetBoardIndex() == boardIndex
+                && move.GetRow() == row
+                && move.GetColumn() == column
+                && move.GetPiece().DisplayValue() == pieceValue
+            )
             {
                 return move;
             }
@@ -221,9 +232,11 @@ public class SaveManager
 
     private static int ReadInt(JsonElement item, string propertyName)
     {
-        if (!item.TryGetProperty(propertyName, out JsonElement value) ||
-            value.ValueKind != JsonValueKind.Number ||
-            !value.TryGetInt32(out int number))
+        if (
+            !item.TryGetProperty(propertyName, out JsonElement value)
+            || value.ValueKind != JsonValueKind.Number
+            || !value.TryGetInt32(out int number)
+        )
         {
             throw new InvalidDataException($"The save is missing a valid {propertyName} value.");
         }
@@ -233,8 +246,10 @@ public class SaveManager
 
     private static bool ReadBool(JsonElement item, string propertyName)
     {
-        if (!item.TryGetProperty(propertyName, out JsonElement value) ||
-            (value.ValueKind != JsonValueKind.True && value.ValueKind != JsonValueKind.False))
+        if (
+            !item.TryGetProperty(propertyName, out JsonElement value)
+            || (value.ValueKind != JsonValueKind.True && value.ValueKind != JsonValueKind.False)
+        )
         {
             throw new InvalidDataException($"The save is missing a valid {propertyName} value.");
         }
@@ -244,8 +259,10 @@ public class SaveManager
 
     private static string ReadString(JsonElement item, string propertyName)
     {
-        if (!item.TryGetProperty(propertyName, out JsonElement value) ||
-            value.ValueKind != JsonValueKind.String)
+        if (
+            !item.TryGetProperty(propertyName, out JsonElement value)
+            || value.ValueKind != JsonValueKind.String
+        )
         {
             throw new InvalidDataException($"The save is missing a valid {propertyName} value.");
         }

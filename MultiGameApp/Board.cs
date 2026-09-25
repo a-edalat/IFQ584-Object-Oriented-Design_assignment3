@@ -1,7 +1,5 @@
 namespace MultiGameApp;
 
-// Moving Display board to GameController or a UI class similar to what Xander was suggesting
-
 public class Board
 {
     // fields
@@ -15,12 +13,18 @@ public class Board
         // I assume the boards should not be smaller than 3 x 3
         if (rows < 3)
         {
-            throw new ArgumentOutOfRangeException(nameof(rows), "A board needs at least three rows.");
+            throw new ArgumentOutOfRangeException(
+                nameof(rows),
+                "A board needs at least three rows."
+            );
         }
 
         if (cols < 3)
         {
-            throw new ArgumentOutOfRangeException(nameof(cols), "A board needs at least three columns.");
+            throw new ArgumentOutOfRangeException(
+                nameof(cols),
+                "A board needs at least three columns."
+            );
         }
 
         this.rows = rows;
@@ -65,8 +69,6 @@ public class Board
             throw new InvalidOperationException("The cell is already occupied.");
         }
 
-        // int index = row * cols + col;
-        // cells[index] = val;
         SetCell(row, col, move.GetPiece());
     }
 
@@ -110,7 +112,7 @@ public class Board
         return cells[row * cols + col];
     }
 
-    public (int Rows, int Columns) GetDimensions() // adding this method to make game display easier, this needs to be added to CRC and class diagram
+    public (int Rows, int Columns) GetDimensions()
     {
         return (rows, cols);
     }

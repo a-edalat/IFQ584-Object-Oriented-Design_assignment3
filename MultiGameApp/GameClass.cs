@@ -8,10 +8,6 @@ public abstract class Game
     private readonly MoveHistory _moveHistory;
     private Player _currentPlayer;
 
-    // private string gameMode;
-    // private bool isGameOver;
-    // private string result;
-
     // constructor
     public Game(List<Player> players, List<Board> boards, GameMode mode)
     {
@@ -89,14 +85,6 @@ public abstract class Game
     }
 
     // Methods
-
-    // in class I only check if the inputs are all numbers and within range
-    // the check for if value is correctly picked form allowed pool and similar
-    // are done within each game specifically
-    // in my CRC this is abstract, but I ended up having a common IsValidMove
-    // and will have specifics later
-    // Made this protected as I am going to use makemove to call this to validate
-    // with protected, derived classes can also use this
     protected virtual bool IsValidMove(Move move)
     {
         ArgumentNullException.ThrowIfNull(move);
@@ -130,11 +118,8 @@ public abstract class Game
         return selectedBoard.IsCellEmpty(row, column);
     }
 
-
-    // adding tmp makemove - can be removed later, boilerplate for me to use when testing game subclasses
     public bool MakeMove(Move move)
     {
-
         ArgumentNullException.ThrowIfNull(move);
 
         if (IsGameOver || !IsValidMove(move))
@@ -164,13 +149,6 @@ public abstract class Game
 
         return true;
     }
-
-    // public void ApplyMove(Move move)
-    // {
-    //     Board selectedBoard = _boards[move.GetBoardIndex()];
-
-    //     selectedBoard.PlaceMove(move);
-    // }
 
     public bool UndoMove()
     {
@@ -262,19 +240,4 @@ public abstract class Game
     public abstract bool WouldMoveWin(Move move);
     public abstract GameResult EvaluateResult();
     public abstract string GetHelpText();
-
-// commenting these two out and replace thme with a function in GameController
-    // public void TakeTurn()
-    // {
-    //     Move proposedMove = _currentPlayer.GetMove();
-    //     MakeMove(proposedMove);
-    // }
-
-    // public void StartGame()
-    // {
-    //     while (Result == GameResult.IN_PROGRESS)
-    //     {
-    //         TakeTurn();
-    //     }
-    // }
 } // closes Game class

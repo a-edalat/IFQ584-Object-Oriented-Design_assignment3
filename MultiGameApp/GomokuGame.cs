@@ -22,7 +22,6 @@ public class GomokuGame : Game
         (1, -1),
     ];
 
-    // assuming functions from CRC/Class diag until codified
     // initialisation
     public GomokuGame(List<Player> players, Board board, GameMode mode)
         : base(ValidatePlayers(players), CreateBoardList(board), mode)

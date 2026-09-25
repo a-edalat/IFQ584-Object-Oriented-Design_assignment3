@@ -8,8 +8,6 @@ public class GameController
     private readonly Help help;
     private readonly GameFactory gameFactory;
 
-    // private readonly string saveFilePath;
-
     // constructor
     public GameController(SaveManager saveManager, Help help, GameFactory gameFactory)
     {
@@ -253,7 +251,7 @@ public class GameController
 
         if (multiBoard)
         {
-            Console.WriteLine("Enter: board row column (or C to cancel"); // check if c is implemented
+            Console.WriteLine("Enter: board row column (or C to cancel"); 
         }
         else if (needsNumber)
         {
