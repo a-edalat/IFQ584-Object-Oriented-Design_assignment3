@@ -3,6 +3,9 @@
 ##
 ## Get latest from `dotnet new gitignore`
 
+# board game save data
+*save.json
+
 # dotenv files
 .env
 
