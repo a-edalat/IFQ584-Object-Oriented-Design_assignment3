@@ -25,55 +25,13 @@
     },
     {
       "PlayerId": 2,
-      "BoardIndex": 2,
-      "Row": 2,
-      "Column": 2,
-      "PieceValue": "X"
-    },
-    {
-      "PlayerId": 1,
-      "BoardIndex": 0,
-      "Row": 0,
-      "Column": 1,
-      "PieceValue": "X"
-    },
-    {
-      "PlayerId": 2,
-      "BoardIndex": 0,
-      "Row": 1,
-      "Column": 0,
-      "PieceValue": "X"
-    },
-    {
-      "PlayerId": 1,
-      "BoardIndex": 0,
-      "Row": 0,
-      "Column": 2,
-      "PieceValue": "X"
-    },
-    {
-      "PlayerId": 2,
-      "BoardIndex": 2,
-      "Row": 1,
-      "Column": 2,
-      "PieceValue": "X"
-    },
-    {
-      "PlayerId": 1,
-      "BoardIndex": 2,
-      "Row": 0,
-      "Column": 0,
-      "PieceValue": "X"
-    },
-    {
-      "PlayerId": 2,
       "BoardIndex": 1,
-      "Row": 0,
-      "Column": 2,
+      "Row": 1,
+      "Column": 0,
       "PieceValue": "X"
     }
   ],
-  "CurrentMoveIndex": 7,
+  "CurrentMoveIndex": 1,
   "CurrentPlayerId": 1,
   "Result": 0
 }

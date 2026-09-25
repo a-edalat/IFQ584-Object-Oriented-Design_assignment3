@@ -6,6 +6,8 @@ public class NumericalTTTGame : Game
 
     private readonly List<Player> _players;
 
+    public const int MaxBoardSize = 1290; // limit to prevent integer overflow
+
     public int BoardSize { get; }
 
     public int TargetSum { get; }

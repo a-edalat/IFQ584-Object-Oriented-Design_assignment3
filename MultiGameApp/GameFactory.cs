@@ -20,6 +20,7 @@ public class GameFactory
     private static NumericalTTTGame CreateNumericalTTTGame(GameMode mode, int boardSize)
     {
         ArgumentOutOfRangeException.ThrowIfLessThan(boardSize, 3);
+        ArgumentOutOfRangeException.ThrowIfGreaterThan(boardSize, NumericalTTTGame.MaxBoardSize);
 
         var playerOnePieces = new List<Piece>();
         var playerTwoPieces = new List<Piece>();

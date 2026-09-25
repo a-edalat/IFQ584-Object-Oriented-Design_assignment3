@@ -169,16 +169,22 @@ public class GameController
 
         while (true)
         {
-            Console.WriteLine("Enter the board size. It must be at least 3:");
+            Console.WriteLine($"Enter the board size from 3 to {NumericalTTTGame.MaxBoardSize}");
 
             string input = Console.ReadLine() ?? string.Empty;
 
-            if (int.TryParse(input, out int boardSize) && boardSize >= 3)
+            if (
+                int.TryParse(input, out int boardSize)
+                && boardSize >= 3
+                && boardSize <= NumericalTTTGame.MaxBoardSize
+            )
             {
                 return boardSize;
             }
 
-            Console.WriteLine("Please enter a whole number of at least 3.");
+            Console.WriteLine(
+                $"Please enter a whole number from 3 to {NumericalTTTGame.MaxBoardSize}"
+            );
         }
     }
 
