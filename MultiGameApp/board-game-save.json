@@ -1,17 +1,15 @@
 {
   "Version": 1,
-  "GameType": 1,
+  "GameType": 0,
   "Mode": 1,
   "BoardSize": 3,
   "Players": [
     {
       "Id": 1,
-      "Name": "Player 1",
       "IsComputer": false
     },
     {
       "Id": 2,
-      "Name": "Computer",
       "IsComputer": true
     }
   ],
@@ -19,16 +17,16 @@
     {
       "PlayerId": 1,
       "BoardIndex": 0,
-      "Row": 0,
-      "Column": 0,
-      "PieceValue": "X"
+      "Row": 1,
+      "Column": 2,
+      "PieceValue": "3"
     },
     {
       "PlayerId": 2,
-      "BoardIndex": 1,
+      "BoardIndex": 0,
       "Row": 1,
       "Column": 0,
-      "PieceValue": "X"
+      "PieceValue": "8"
     }
   ],
   "CurrentMoveIndex": 1,
